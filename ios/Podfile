@@ -15,7 +15,7 @@ if linkage != nil
   use_frameworks! :linkage => linkage.to_sym
 end
 
-target 'DummyProject' do
+target 'VokkaApp' do
   config = use_native_modules!
 
   pod 'react-native-config/Extension', :path => '../node_modules/react-native-config'
@@ -27,7 +27,7 @@ target 'DummyProject' do
     :app_path => "#{Pod::Config.instance.installation_root}/.."
   )
 
-  target 'DummyProjectTests' do
+  target 'VokkaAppTests' do
     inherit! :complete
     # Pods for testing
   end

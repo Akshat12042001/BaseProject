@@ -1,4 +1,4 @@
-package com.dummyproject;
+package com.app.vokka;
 
 import com.facebook.react.ReactActivity
 import com.facebook.react.ReactActivityDelegate
@@ -12,7 +12,7 @@ import com.facebook.react.defaults.DefaultReactActivityDelegate
    * rendering of the component.
    */
 
- override fun getMainComponentName(): String = "DummyProject"
+ override fun getMainComponentName(): String = "Vokka App"
 
 
   /**
