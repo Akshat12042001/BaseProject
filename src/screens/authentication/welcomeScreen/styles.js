@@ -1,9 +1,7 @@
-import {StyleSheet} from 'react-native';
+import { StyleSheet } from 'react-native';
 
 const styles = StyleSheet.create({
   root: {
-    boxShadow: 'inset 2 2 15 grey',
-    borderWidth: 1,
     height: 100,
     width: 200,
     justifyContent: 'center',
@@ -12,6 +10,7 @@ const styles = StyleSheet.create({
     alignSelf: 'center',
     alignContent: 'center',
     backgroundColor: 'white',
+    boxShadow: '0 0 10 0 rgba(255, 0, 0, 0.5)',
   },
 });
 export default styles;
