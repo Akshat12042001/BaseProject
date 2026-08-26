@@ -1,4 +1,4 @@
-import React, {useCallback, useEffect, useMemo} from 'react';
+import React, {useCallback, useEffect, useMemo, useState} from 'react';
 import {FlatList, ScrollView, TouchableOpacity, View} from 'react-native';
 import Skeleton from 'react-native-reanimated-skeleton';
 import {useTranslation} from 'react-i18next';
@@ -21,6 +21,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import moment from 'moment';
 import { makeMeRequest } from '../../../api/auth';
 import { setUserData } from '../../../redux/auth/auth.reducer';
+import {getTimeBasedGreetingKey} from '../../../utils/greeting';
 
 const QUICK_ACTIONS = [
   {translationKey: 'HOME.QUICK_ACTIONS.MENU', Icon: MenuIcon, type: 'menu'},
@@ -73,6 +74,7 @@ const HomeScreen = () => {
   const user = useSelector((state) => state.auth.user);
   const dispatch = useDispatch();
   const recentProperties = dashboardData?.recentProperties || [];
+  const [greetingKey, setGreetingKey] = useState(getTimeBasedGreetingKey);
 
 
 const STATS_DATA = useMemo(() => [
@@ -87,6 +89,7 @@ const STATS_DATA = useMemo(() => [
 
 
   useFocusEffect(useCallback(() => {
+    setGreetingKey(getTimeBasedGreetingKey());
     refetchDashboard();
   }, [refetchDashboard]));
 
@@ -157,7 +160,7 @@ useEffect(() => {
             size={24}
             lineHeight={28}
             containerStyle={styles.greeting}>
-            {t('HOME.GREETING', {name: user?.firstName})}
+            {t(greetingKey, {name: user?.firstName})}
           </StyledText>
         </View>
 
@@ -219,7 +222,7 @@ useEffect(() => {
             <StyledText variant="bold" size={18}>
               {t('HOME.YOUR_PROPERTIES')}
             </StyledText>
-            <StyledText color={COLORS.SUCCESS} variant="bold" size={12}>
+            <StyledText color={COLORS.SUCCESS} variant="bold" size={12} onPress={() => navigation.navigate(NAVIGATION.TABS.PROPERTIES_SCREEN)}>
               {t('HOME.SEE_ALL')}
             </StyledText>
           </View>

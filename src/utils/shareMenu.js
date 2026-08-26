@@ -1,42 +1,19 @@
 import Share from 'react-native-share';
-import {makeFoodMenuPdfRequest} from '../api/common';
+import {createMenuPdfFile, getMenuPdfFileName, getMenuPdfUri} from './menuPdf';
 
-const arrayBufferToBase64 = buffer => {
-  const bytes = new Uint8Array(buffer);
-  let binary = '';
-
-  bytes.forEach(byte => {
-    binary += String.fromCharCode(byte);
-  });
-
-  return global.btoa(binary);
-};
-
-const getFileName = menu => {
-  const identifier = menu?.title || 'menu';
-  return `menu-${String(identifier).replace(/[^a-zA-Z0-9-_]/g, '-')}`;
-};
-
-export const previewMenuPdf = async (menuPayload, title = 'Menu preview') => {
-  const pdfBuffer = await makeFoodMenuPdfRequest(menuPayload);
-
-  if (!pdfBuffer?.byteLength) {
-    throw new Error('Menu PDF could not be generated');
-  }
-
-  const base64 = arrayBufferToBase64(pdfBuffer);
-  const fileName = getFileName(menuPayload);
+export const shareMenuPdf = async (menuPayload, title = 'Share menu') => {
+  const filePath = await createMenuPdfFile(menuPayload);
 
   await Share.open({
     title,
     subject: menuPayload?.title || 'Menu',
-    url: `data:application/pdf;base64,${base64}`,
+    url: getMenuPdfUri(filePath),
     type: 'application/pdf',
-    filename: `${fileName}.pdf`,
+    filename: getMenuPdfFileName(menuPayload),
     failOnCancel: false,
   });
 
-  return pdfBuffer;
+  return filePath;
 };
 
-export default previewMenuPdf;
+export default shareMenuPdf;

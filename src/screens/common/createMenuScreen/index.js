@@ -19,11 +19,13 @@ import {
   LoginEyeIcon,
   UploadIcon,
 } from '../../../components/svgs';
+import {MenuPdfPreviewModal} from '../../../components/modals';
 import {makeCreateFoodMenuRequest, makeGetSingleFoodMenuRequest, makeUpdateFoodMenuRequest} from '../../../api/common';
 import {ASSETS, COLORS} from '../../../constants';
 import {buildMenuPayload, formatMenuDetails} from '../../../utils/menu';
+import {createMenuPdfFile} from '../../../utils/menuPdf';
 import {errorToast, successToast} from '../../../utils/alerts';
-import {previewMenuPdf} from '../../../utils/shareMenu';
+import {shareMenuPdf} from '../../../utils/shareMenu';
 import styles from './styles';
 
 const TEMPLATES = [
@@ -52,6 +54,8 @@ const CreateMenuScreen = () => {
   const [isSaving, setIsSaving] = useState(false);
   const [isPreviewLoading, setIsPreviewLoading] = useState(false);
   const [isShareLoading, setIsShareLoading] = useState(false);
+  const [isPreviewVisible, setIsPreviewVisible] = useState(false);
+  const [previewPdfPath, setPreviewPdfPath] = useState('');
 
   useEffect(() => {
     if (routeMenuId) {
@@ -147,44 +151,56 @@ const CreateMenuScreen = () => {
     navigation.goBack();
   }, [navigation]);
 
-  const openMenuPdf = useCallback(
-    async title => {
-      if (!menuName.trim()) {
-        errorToast(t('CREATE_MENU.MENU_NAME_REQUIRED'));
-        return;
-      }
+  const validateMenuForPdf = useCallback(() => {
+    if (!menuName.trim()) {
+      errorToast(t('CREATE_MENU.MENU_NAME_REQUIRED'));
+      return false;
+    }
 
-      if (!selectedTemplate) {
-        errorToast(t('CREATE_MENU.TEMPLATE_REQUIRED'));
-        return;
-      }
+    if (!selectedTemplate) {
+      errorToast(t('CREATE_MENU.TEMPLATE_REQUIRED'));
+      return false;
+    }
 
-      await previewMenuPdf(menuPayload, title);
-    },
-    [menuName, menuPayload, selectedTemplate, t],
-  );
+    return true;
+  }, [menuName, selectedTemplate, t]);
+
+  const handleClosePreview = useCallback(() => {
+    setIsPreviewVisible(false);
+    setPreviewPdfPath('');
+  }, []);
 
   const handlePreview = useCallback(async () => {
+    if (!validateMenuForPdf()) {
+      return;
+    }
+
     try {
       setIsPreviewLoading(true);
-      await openMenuPdf(t('CREATE_MENU.PREVIEW'));
+      const filePath = await createMenuPdfFile(menuPayload);
+      setPreviewPdfPath(filePath);
+      setIsPreviewVisible(true);
     } catch {
       errorToast(t('CREATE_MENU.PREVIEW_FAILED'));
     } finally {
       setIsPreviewLoading(false);
     }
-  }, [openMenuPdf, t]);
+  }, [menuPayload, t, validateMenuForPdf]);
 
   const handleShare = useCallback(async () => {
+    if (!validateMenuForPdf()) {
+      return;
+    }
+
     try {
       setIsShareLoading(true);
-      await openMenuPdf(t('CREATE_MENU.SHARE'));
+      await shareMenuPdf(menuPayload, t('CREATE_MENU.SHARE'));
     } catch {
       errorToast(t('CREATE_MENU.SHARE_FAILED'));
     } finally {
       setIsShareLoading(false);
     }
-  }, [openMenuPdf, t]);
+  }, [menuPayload, t, validateMenuForPdf]);
 
   const handleSave = useCallback(async () => {
     if (!menuName.trim()) {
@@ -420,6 +436,13 @@ const CreateMenuScreen = () => {
           </View>
         )}
       </View>
+
+      <MenuPdfPreviewModal
+        isVisible={isPreviewVisible}
+        pdfPath={previewPdfPath}
+        title={menuName || t('CREATE_MENU.PREVIEW')}
+        onClose={handleClosePreview}
+      />
     </ScreenContainer>
   );
 };

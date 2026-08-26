@@ -46,7 +46,7 @@ export default StyleSheet.create({
     marginTop: 5,
   },
   summary: {
-    width: 83,
+    // width: 83,
   },
   summaryDivider: {
     backgroundColor: COLORS.HEADER_DIVIDER,

@@ -55,7 +55,7 @@ const CustomTabBar = ({state, navigation}) => {
   };
 
   return (
-    <View style={{marginBottom: insets.bottom || 10, borderTopWidth:1, borderTopColor:COLORS.BORDER, paddingTop:10}}>
+    <View style={{paddingBottom: insets.bottom || 10, borderTopWidth:1, borderTopColor:COLORS.BORDER, paddingTop:10, backgroundColor:COLORS.BACKGROUND}}>
       <View style={styles.tabRow}>
         {state.routes.map((route, index) => {
           const isFocused = state?.index === index;

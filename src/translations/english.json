@@ -10,7 +10,10 @@
         "BRAND": "BOONIES",
         "TAGLINE": "PAHADI GHAR, PAHADI KHANA",
         "DATE": "Tuesday, 12 August",
-        "GREETING": "Good morning\n{{name}}",
+        "GREETING_MORNING": "Good morning\n{{name}}",
+        "GREETING_AFTERNOON": "Good afternoon\n{{name}}",
+        "GREETING_EVENING": "Good evening\n{{name}}",
+        "GREETING_NIGHT": "Good night\n{{name}}",
         "CREATE_INVOICE": "Create invoice",
         "CREATE_INVOICE_SUBTITLE": "Bill a guest for their stay",
         "QUICK_ACTIONS": {

@@ -12,7 +12,7 @@ export default StyleSheet.create({
   },
   compactContainer: {
     width: SCREEN.WIDTH / 2 - 14,
-    height: 175,
+    height: 185,
   },
   image: {
     alignItems: 'center',
