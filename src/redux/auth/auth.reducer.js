@@ -4,6 +4,7 @@ import {loginRequest, logoutRequest} from './auth.action';
 const INITIAL_STATE = {
   isLoading: false,
   isLoggedIn: false,
+  user: null,
 };
 
 const authSlice = createSlice({
@@ -13,6 +14,13 @@ const authSlice = createSlice({
     reset: state => {
       state.isLoading = false;
       state.isLoggedIn = false;
+      state.user = null;
+    },
+    setUserData: (state, action) => {
+      state.user = action.payload;
+    },
+    setIsLoggedIn: (state, action) => {
+      state.isLoggedIn = action.payload;
     },
   },
   extraReducers: builder => {
@@ -38,6 +46,6 @@ const authSlice = createSlice({
   },
 });
 
-export const {reset} = authSlice.actions;
+export const {reset, setUserData, setIsLoggedIn} = authSlice.actions;
 
 export default authSlice.reducer;

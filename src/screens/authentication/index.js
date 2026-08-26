@@ -1,1 +1,2 @@
-export { default as WelcomeScreen } from './welcomeScreen';
+export { default as LoginScreen } from './loginScreen';
+export { default as ForgotPasswordScreen } from './forgotPasswordScreen';

@@ -20,7 +20,7 @@ const StyledText: React.FC<StyleTextProps> = ({
   onLayout,
   variant = 'regular',
   size = FONT_SIZE.MD,
-  color = COLORS.PRIMARY,
+  color = COLORS.TEXT,
   lineHeight,
   textStyle,
   textAlign = 'left',

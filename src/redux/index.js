@@ -1,6 +1,7 @@
 import {configureStore} from '@reduxjs/toolkit';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import rootReducer from './rootReducer';
+import {tabsApi} from './tabs/api';
 import {
   FLUSH,
   PAUSE,
@@ -14,7 +15,7 @@ import {
 
 const persistConfig = {
   key: 'root',
-  blacklist: [],
+  blacklist: [tabsApi.reducerPath],
   storage: AsyncStorage,
 };
 
@@ -22,13 +23,12 @@ const persistedReducer = persistReducer(persistConfig, rootReducer);
 
 const store = configureStore({
   reducer: persistedReducer,
-  middleware: getDefaultMiddleware => [
-    ...getDefaultMiddleware({
+  middleware: getDefaultMiddleware =>
+    getDefaultMiddleware({
       serializableCheck: {
         ignoredActions: [FLUSH, REHYDRATE, PAUSE, PERSIST, PURGE, REGISTER],
       },
-    }),
-  ],
+    }).concat(tabsApi.middleware),
 });
 
 const persistor = persistStore(store);

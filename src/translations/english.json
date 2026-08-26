@@ -1,0 +1,292 @@
+{
+    "TABS": {
+        "HOME": "Home",
+        "MENU": "Menu",
+        "INVOICES": "Invoices",
+        "PROPERTIES": "Properties",
+        "MORE": "More"
+    },
+    "HOME": {
+        "BRAND": "BOONIES",
+        "TAGLINE": "PAHADI GHAR, PAHADI KHANA",
+        "DATE": "Tuesday, 12 August",
+        "GREETING": "Good morning\n{{name}}",
+        "CREATE_INVOICE": "Create invoice",
+        "CREATE_INVOICE_SUBTITLE": "Bill a guest for their stay",
+        "QUICK_ACTIONS": {
+            "MENU": "Menu",
+            "PROPERTIES": "Properties",
+            "LOGO": "Logo"
+        },
+        "STATS": {
+            "INVOICES": "Invoices · Aug",
+            "PROPERTIES": "Properties",
+            "MENU_ITEMS": "Menu items"
+        },
+        "YOUR_PROPERTIES": "Your properties",
+        "SEE_ALL": "See all",
+        "NO_DATA_FOUND": "No data found",
+        "PROPERTY_PHOTO": "property photo",
+        "PROPERTY": {
+            "ROOMS": "{{count}} rooms",
+            "GUESTS": "{{count}} Guests",
+            "BEDROOMS": "{{count}} Bedrooms",
+            "BATHROOMS": "{{count}} Bathrooms",
+            "PER_NIGHT": "/ night"
+        },
+        "PROPERTY_ONE": {
+            "NAME": "Deodar House",
+            "DETAILS": "Narkanda · 4 rooms",
+            "BADGE": "2 in-stay"
+        },
+        "PROPERTY_TWO": {
+            "NAME": "The Orchard Cottage",
+            "DETAILS": "Thanedhar · 2 rooms"
+        }
+    },
+    "INVOICES": {
+        "TITLE": "Invoices",
+        "NEW": "New",
+        "BILLED_AMOUNT": "₹60,250",
+        "BILLED_LABEL": "Billed in August",
+        "OUTSTANDING_AMOUNT": "₹13,400",
+        "OUTSTANDING_LABEL": "Outstanding",
+        "DUE_AMOUNT": "Due {{amount}}",
+        "STAY_DETAILS": "{{count}} nights · created {{date}}",
+        "EMPTY": "No invoices found",
+        "LOAD_ERROR": "Unable to load invoices. Pull down to try again.",
+        "STATUS": {
+            "DRAFT": "Draft",
+            "PAID": "Paid",
+            "SETTLED": "Settled"
+        },
+        "ANJALI": {
+            "INITIALS": "AM",
+            "NAME": "Anjali Mehta",
+            "DATES": "12 Aug – 15 Aug 2026",
+            "STAY": "3 nights · created 11 Aug",
+            "AMOUNT": "₹18,400",
+            "DUE": "Due ₹13,400"
+        },
+        "ROHIT": {
+            "INITIALS": "RS",
+            "NAME": "Rohit Sharma",
+            "DATES": "02 Aug – 04 Aug 2026",
+            "STAY": "2 nights · created 02 Aug",
+            "AMOUNT": "₹9,750"
+        },
+        "GREWAL": {
+            "INITIALS": "GF",
+            "NAME": "Grewal family",
+            "DATES": "28 Jul – 31 Jul 2026",
+            "STAY": "3 nights · created 27 Jul",
+            "AMOUNT": "₹24,200"
+        },
+        "MEERA": {
+            "INITIALS": "MN",
+            "NAME": "Meera Nair",
+            "DATES": "20 Jul – 22 Jul 2026",
+            "STAY": "2 nights · created 20 Jul",
+            "AMOUNT": "₹7,900"
+        }
+    },
+    "MENU": {
+        "TITLE": "Menu",
+        "SUBTITLE": "{{count}} menus · shared as PDF with guests",
+        "NEW": "New",
+        "EMPTY": "No menus found",
+        "LOAD_ERROR": "Unable to load menus. Pull down to try again.",
+        "ITEM_COUNT_ONE": "{{count}} item",
+        "ITEM_COUNT_OTHER": "{{count}} items",
+        "BOONIES": {
+            "NAME": "The Boonies Narkanda",
+            "DESCRIPTION": "Himalayan · 24 items",
+            "UPDATED": "Updated 3 days ago"
+        },
+        "BREAKFAST": {
+            "NAME": "Breakfast only",
+            "DESCRIPTION": "Minimal · 9 items",
+            "UPDATED": "Updated 2 weeks ago"
+        },
+        "BONFIRE": {
+            "NAME": "Bonfire BBQ night",
+            "DESCRIPTION": "Heritage · 12 items",
+            "UPDATED": "Updated 1 Jul"
+        }
+    },
+    "PROPERTIES": {
+        "TITLE": "Properties",
+        "SUBTITLE": "{{count}} properties · manage your homestays",
+        "NEW": "New",
+        "EMPTY": "No properties found",
+        "LOAD_ERROR": "Unable to load properties. Pull down to try again.",
+        "CANCELLATION": "Cancellation: {{policy}}",
+        "MORE_OPTIONS": "More options"
+    },
+    "MORE": {
+        "TITLE": "More",
+        "SUBTITLE": "Account settings",
+        "LOGOUT": "Logout",
+        "LOGOUT_TITLE": "Logout",
+        "LOGOUT_MESSAGE": "Do you really want to logout?"
+    },
+    "LOGIN_SCREEN": {
+        "SIGN_IN_TO_YOUR_ACCOUNT": "Sign in to your account",
+        "CHOOSE_LOGIN_METHOD": "Choose Login Method",
+        "PASSWORD_METHOD": "Password",
+        "EMAIL_OTP_METHOD": "Email OTP",
+        "FORGOT_PASSWORD": "Forgot password?"
+    },
+    "FORGOT_PASSWORD_SCREEN": {
+        "TITLE": "Forgot Password",
+        "DESCRIPTION": "Enter your email address and we'll send you a link to reset your password",
+        "REMEMBER_PASSWORD": "Remember your password?",
+        "SIGN_IN": "Sign in"
+    },
+    "VERIFY_OTP_MODAL": {
+        "TITLE": "Verify Your Email",
+        "DESCRIPTION": "Enter the 6-digit verification code sent to",
+        "VERIFY_EMAIL": "Verify Email",
+        "DID_NOT_RECEIVE": "Didn't receive the code?",
+        "RESEND_OTP": "Resend OTP",
+        "INVALID_OTP": "Please enter the complete verification code"
+    },
+    "BUTTONS": {
+        "SIGN_IN": "Sign in",
+        "SEND_VERIFICATION_OTP": "Send Verification OTP",
+        "SEND_RESET_LINK": "Send Reset Link"
+    },
+    "LABELS": {
+        "EMAIL_ADDRESS": "Email address",
+        "PASSWORD": "Password"
+    },
+    "PLACEHOLDERS": {
+        "ENTER_YOUR_EMAIL": "Enter your email",
+        "ENTER_YOUR_EMAIL_ADDRESS": "Enter your email address",
+        "ENTER_YOUR_PASSWORD": "Enter your password",
+        "OK": "OK",
+        "YES": "Yes",
+        "NO": "No"
+    },
+    "CREATE_INVOICE": {
+        "TITLE": "New invoice",
+        "EDIT_TITLE": "Edit invoice",
+        "SUBTITLE": "Deodar House · 3 nights",
+        "BACK": "Go back",
+        "DRAFT": "Draft",
+        "STAY_DETAILS": "Stay details",
+        "CHECK_IN": "Check-in",
+        "CHECK_OUT": "Check-out",
+        "DATE_PLACEHOLDER": "DD/MM/YYYY",
+        "SELECT_DATE": "Select date",
+        "CONFIRM": "Confirm",
+        "CANCEL": "Cancel",
+        "PAYMENT_TERMS": "Payment terms",
+        "PAYMENT_TERMS_PLACEHOLDER": "Enter payment terms",
+        "FROM": "From",
+        "FROM_PLACEHOLDER": "Select property",
+        "BILL_TO": "Bill to",
+        "BILL_TO_PLACEHOLDER": "Guest name and contact details",
+        "ITEMS": "Items",
+        "ITEMS_COUNT_ONE": "{{count}} item",
+        "ITEMS_COUNT_OTHER": "{{count}} items",
+        "ITEM_NUMBER": "Item No.{{number}}",
+        "ITEM": "Item",
+        "ITEM_PLACEHOLDER": "Select or type an item",
+        "QUANTITY": "Quantity",
+        "AMOUNT": "Amount",
+        "LINE_TOTAL": "Total : {{amount}}",
+        "DELETE_ITEM": "Delete item",
+        "ADD_LINE_ITEM": "Line Item",
+        "SUBTOTAL": "Subtotal",
+        "TAX": "Tax",
+        "DISCOUNT": "Discount",
+        "NOTES": "Notes",
+        "NOTES_PLACEHOLDER": "Notes - any relevant information not already covered",
+        "TERMS": "Terms",
+        "TERMS_PLACEHOLDER": "Terms and conditions - late fees, payment methods, delivery schedule",
+        "AMOUNT_PAID": "Amount Paid",
+        "BALANCE_DUE": "Balance Due",
+        "TOTAL": "Total",
+        "SAVE": "Save",
+        "SHARE": "Share",
+        "SAVE_SHARE": "Save & share",
+        "SHARE_TITLE": "Share invoice",
+        "SHARE_FAILED": "Invoice was saved, but the PDF could not be shared",
+        "CREATED_SUCCESSFULLY": "Invoice created successfully",
+        "UPDATED_SUCCESSFULLY": "Invoice updated successfully"
+    },
+    "CREATE_MENU": {
+        "TITLE": "New menu",
+        "EDIT_TITLE": "Edit menu",
+        "BACK": "Go back",
+        "PREVIEW": "Preview menu",
+        "HEADER_SUBTITLE": "{{count}} items · {{template}} template",
+        "HEADER_SUBTITLE_ITEMS": "{{count}} items",
+        "TEMPLATE": "Template",
+        "TEMPLATE_HINT": "swipe · tap to select",
+        "TEMPLATES": {
+            "CLASSIC": "Classic",
+            "HIMALAYAN": "Himalayan",
+            "HERITAGE": "Heritage",
+            "MINIMAL": "Minimal",
+            "ESSENTIAL": "Essential"
+        },
+        "MENU_DETAILS": "Menu details",
+        "LOGO": "LOGO",
+        "LOGO_PLACEHOLDER": "Add logo",
+        "LOGO_SELECTED": "Menu logo",
+        "LOGO_HINT": "Tap to select logo",
+        "MENU_NAME": "Menu name *",
+        "MENU_NAME_PLACEHOLDER": "Enter menu name",
+        "TAGLINE": "Tagline",
+        "TAGLINE_PLACEHOLDER": "Enter tagline",
+        "ORDERS_PHONE": "Orders phone *",
+        "ORDERS_PHONE_PLACEHOLDER": "Enter phone number",
+        "KITCHEN_HOURS": "Kitchen hours *",
+        "KITCHEN_HOURS_PLACEHOLDER": "Enter kitchen hours",
+        "REMOVE_CATEGORY": "Remove category",
+        "SAVE_CHANGES": "Save changes",
+        "SHARE": "Share menu",
+        "UPDATED_SUCCESSFULLY": "Menu updated successfully",
+        "CREATED_SUCCESSFULLY": "Menu created successfully",
+        "MENU_NAME_REQUIRED": "Menu name is required",
+        "TEMPLATE_REQUIRED": "Please select a template",
+        "PREVIEW_FAILED": "Unable to generate menu preview",
+        "SHARE_FAILED": "Unable to share menu PDF",
+        "CATEGORIES_TITLE": "Categories and items",
+        "CATEGORIES_SUBTITLE": "Organise dishes by category. Each category needs at least one item.",
+        "CATEGORY_NAME": "Category *",
+        "SUGGESTED_CATEGORIES": "Suggested categories",
+        "SUGGESTED": {
+            "BREAKFAST": "Breakfast",
+            "SNACKS": "Snacks",
+            "LUNCH": "Lunch",
+            "MAIN_COURSE": "Main Course",
+            "DINNER": "Dinner",
+            "DRINKS": "Drinks",
+            "DESSERT": "Dessert"
+        },
+        "ITEM_NAME": "Item name *",
+        "ITEM_PRICE": "Price (₹) *",
+        "NON_VEG": "Non-Veg",
+        "MUST_HAVE": "Must Have",
+        "ADD_ITEM": "Add item",
+        "ADD_CATEGORY": "Add new category",
+        "MOVE_CATEGORY_UP": "Move category up",
+        "MOVE_CATEGORY_DOWN": "Move category down",
+        "DUPLICATE_ITEM": "Duplicate item",
+        "REMOVE_ITEM": "Remove item"
+    },
+    "ERRORS": {
+        "REQUIRED": "This field is required",
+        "MUST_BE_AT_LEAST_2_CHARACTERS": "Must be at least 2 characters",
+        "EMAIL_IS_REQUIRED": "Email is required",
+        "EMAIL_IS_INVALID": "Email is invalid",
+        "PHONE_MUST_BE_10_DIGITS": "Phone number must be 10 digits",
+        "PINCODE_IS_NOT_VALID": "Pincode is not valid",
+        "MUST_BE_AT_LEAST_8_CHARACTERS": "Must be at least 8 characters",
+        "PASSWORD_LONG": "Password must include uppercase, lowercase, number, and special characters",
+        "PASSWORD_MUST_MATCH": "Passwords must match"
+    }
+}
