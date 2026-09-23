@@ -1,5 +1,5 @@
 import {StyleSheet} from 'react-native';
-import {COLORS, FONTS} from '../../../constants';
+import {COLORS} from '../../../constants';
 
 export default StyleSheet.create({
   screen: {
@@ -8,7 +8,7 @@ export default StyleSheet.create({
   },
   header: {
     backgroundColor: COLORS.PRIMARY_DARK,
-    paddingBottom: 60,
+    paddingBottom: 24,
     paddingHorizontal: 14,
     paddingTop: 8,
   },
@@ -16,19 +16,6 @@ export default StyleSheet.create({
     alignItems: 'flex-start',
     flexDirection: 'row',
     justifyContent: 'space-between',
-  },
-  brand: {
-    color: COLORS.SURFACE,
-    fontFamily: FONTS.extraBold,
-    fontSize: 15,
-    letterSpacing: 3,
-  },
-  tagline: {
-    color: '#84A98B',
-    fontFamily: FONTS.bold,
-    fontSize: 7,
-    letterSpacing: 2,
-    marginTop: 2,
   },
   notification: {
     alignItems: 'center',
@@ -47,85 +34,150 @@ export default StyleSheet.create({
   },
   body: {
     flex: 1,
-    marginTop: -43,
   },
   content: {
     paddingBottom: 90,
     paddingHorizontal: 14,
+    paddingTop: 12,
   },
-  invoiceCard: {
-    alignItems: 'center',
+  quickStatsCard: {
     backgroundColor: COLORS.SURFACE,
     borderColor: COLORS.BORDER_LIGHT,
     borderRadius: 14,
     borderWidth: 1,
-    flexDirection: 'row',
-    minHeight: 69,
-    paddingHorizontal: 13,
-    shadowColor: '#152B1A',
-    shadowOffset: {width: 0, height: 3},
-    shadowOpacity: 0.09,
-    shadowRadius: 8,
-    elevation: 3,
-  },
-  invoiceIcon: {
-    alignItems: 'center',
-    backgroundColor: COLORS.SUCCESS,
-    borderRadius: 10,
-    height: 41,
-    justifyContent: 'center',
-    width: 41,
-  },
-  invoiceCopy: {
-    flex: 1,
-    marginLeft: 11,
-  },
-  quickActions: {
-    flexDirection: 'row',
-    gap: 8,
-    marginTop: 12,
-  },
-  quickAction: {
-    backgroundColor: COLORS.SURFACE,
-    borderColor: COLORS.BORDER_LIGHT,
-    borderRadius: 12,
-    borderWidth: 1,
-    flex: 1,
-    height: 75,
-    justifyContent: 'center',
-    paddingHorizontal: 10,
+    paddingHorizontal: 16,
+    paddingVertical: 14,
     shadowColor: '#152B1A',
     shadowOffset: {width: 0, height: 2},
     shadowOpacity: 0.04,
     shadowRadius: 4,
     elevation: 1,
   },
-  quickIcon: {
-    alignItems: 'center',
-    backgroundColor: '#EDF4EF',
-    borderRadius: 10,
-    height: 31,
-    justifyContent: 'center',
-    marginBottom: 7,
-    width: 31,
+  quickStatsTitle: {
+    letterSpacing: 0.4,
   },
-  stats: {
+  quickStatsGrid: {
+    marginTop: 12,
+  },
+  quickStatsRow: {
+    alignItems: 'stretch',
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+  },
+  quickStatsRowSpacing: {
+    marginTop: 10,
+  },
+  quickStatWrapper: {
+    width: '48%',
+  },
+  quickStatCard: {
+    alignItems: 'center',
+    backgroundColor: COLORS.SURFACE,
+    borderColor: COLORS.BORDER_LIGHT,
+    borderRadius: 12,
+    borderWidth: 1,
+    flex: 1,
+    justifyContent: 'space-between',
+    minHeight: 118,
+    paddingHorizontal: 10,
+    paddingVertical: 12,
+  },
+  quickStatContent: {
+    alignItems: 'center',
+    width: '100%',
+  },
+  quickStatIconWrap: {
+    alignItems: 'center',
+    borderRadius: 10,
+    height: 34,
+    justifyContent: 'center',
+    marginBottom: 8,
+    width: 34,
+  },
+  quickStatLabel: {
+    marginBottom: 4,
+    textAlign: 'center',
+  },
+  quickStatValue: {
+    marginBottom: 2,
+    textAlign: 'center',
+  },
+  redeemButton: {
+    alignItems: 'center',
+    backgroundColor: '#FBF4DF',
+    borderRadius: 14,
+    flexDirection: 'row',
+    gap: 4,
+    marginTop: 8,
+    paddingHorizontal: 8,
+    paddingVertical: 5,
+  },
+  redeemSpacer: {
+    height: 28,
+    marginTop: 8,
+  },
+  manageSection: {
+    backgroundColor: COLORS.SURFACE,
+    borderColor: COLORS.BORDER_LIGHT,
+    borderRadius: 14,
+    borderWidth: 1,
+    marginTop: 14,
+    paddingHorizontal: 14,
+    paddingVertical: 14,
+    shadowColor: '#152B1A',
+    shadowOffset: {width: 0, height: 2},
+    shadowOpacity: 0.04,
+    shadowRadius: 4,
+    elevation: 1,
+  },
+  manageTitle: {
+    letterSpacing: 0.4,
+  },
+  manageSubtitle: {
+    marginBottom: 12,
+    marginTop: 4,
+  },
+  manageGrid: {
+    marginTop: 2,
+  },
+  manageRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+  },
+  manageRowSpacing: {
+    marginTop: 10,
+  },
+  manageToolWrapper: {
+    width: '48%',
+  },
+  manageToolCard: {
+    alignItems: 'center',
     backgroundColor: COLORS.SURFACE,
     borderColor: COLORS.BORDER_LIGHT,
     borderRadius: 12,
     borderWidth: 1,
     flexDirection: 'row',
-    marginTop: 14,
-    overflow: 'hidden',
+    minHeight: 88,
+    paddingHorizontal: 8,
+    paddingVertical: 10,
   },
-  stat: {
+  manageToolIconWrap: {
+    alignItems: 'center',
+    borderRadius: 18,
+    height: 36,
+    justifyContent: 'center',
+    width: 36,
+  },
+  manageToolCopy: {
     flex: 1,
-    paddingHorizontal: 11,
-    paddingVertical: 13,
+    marginHorizontal: 6,
   },
-  statBorder: {
-    borderLeftColor: COLORS.BORDER_LIGHT,
-    borderLeftWidth: 1,
+  manageToolAction: {
+    alignItems: 'center',
+    borderRadius: 14,
+    height: 28,
+    justifyContent: 'center',
+    width: 28,
   },
   sectionHeader: {
     alignItems: 'center',
@@ -137,6 +189,7 @@ export default StyleSheet.create({
   propertyList: {
     gap: 10,
     paddingRight: 14,
+    paddingBottom: 40,
   },
   statsSkeletonContainer: {
     width: '100%',

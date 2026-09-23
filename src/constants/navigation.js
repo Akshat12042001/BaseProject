@@ -17,6 +17,9 @@ export default {
     },
     COMMON: {
         CREATE_INVOICE_SCREEN: 'Common-CreateInvoiceScreen',
-        CREATE_MENU_SCREEN: 'Common-CreateMenuScreen'
+        CREATE_MENU_SCREEN: 'Common-CreateMenuScreen',
+        CREATE_LOGO_SCREEN: 'Common-CreateLogoScreen',
+        PROPERTY_DETAIL_SCREEN: 'Common-PropertyDetailScreen',
+        CREATE_BOOKING_SCREEN: 'Common-CreateBookingScreen'
     }
 };

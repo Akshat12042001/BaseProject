@@ -44,6 +44,7 @@ const App = () => {
             persistor={persistor}
             onBeforeLift={onBeforeLift}>
             <ToastManager
+            useModal={true}
               animationStyle="fade"
               showCloseIcon={false}
               config={toastConfig}

@@ -33,4 +33,11 @@ export default StyleSheet.create({
   disabledRow: {
     opacity: 0.7,
   },
+  logoutRowContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    flex: 1,
+    marginLeft: 10,
+  },
 });

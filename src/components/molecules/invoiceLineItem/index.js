@@ -33,6 +33,7 @@ const InvoiceLineItem = ({
     selectedItem => {
       onChange(item.id, 'name', selectedItem.title);
       onChange(item.id, 'amount', String(selectedItem.amount));
+      onChange(item.id, 'quantity', '1');
     },
     [item.id, onChange],
   );

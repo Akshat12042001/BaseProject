@@ -32,7 +32,7 @@ import {COLORS} from '../../../constants';
 import {
   makeCreateBillRequest,
   makeGetBillDetailsRequest,
-  makeGetFoodMenuRequest,
+  makeGetFoodMenuBillItemsRequest,
   makeUpdateBillRequest,
 } from '../../../api/common';
 import {
@@ -40,7 +40,7 @@ import {
   formatBillDetails,
   formatCurrencyWithDecimals,
   formatActiveProperties,
-  formatFoodMenuItems,
+  formatMenuBillItems,
 } from '../../../utils/invoice';
 import {errorToast, successToast} from '../../../utils/alerts';
 import {shareInvoice} from '../../../utils/shareInvoice';
@@ -130,11 +130,12 @@ const CreateInvoiceScreen = () => {
   useEffect(() => {
     let isMounted = true;
 
-    const fetchFoodMenu = async () => {
+    const fetchBillItems = async () => {
       try {
-        const response = await makeGetFoodMenuRequest();
+        setIsFoodMenuLoading(true);
+        const response = await makeGetFoodMenuBillItemsRequest();
         if (isMounted) {
-          setItemOptions(formatFoodMenuItems(response));
+          setItemOptions(formatMenuBillItems(response));
         }
       } catch {
         if (isMounted) {
@@ -147,7 +148,7 @@ const CreateInvoiceScreen = () => {
       }
     };
 
-    fetchFoodMenu();
+    fetchBillItems();
 
     return () => {
       isMounted = false;

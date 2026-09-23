@@ -7,3 +7,5 @@ export {default as MenuCard} from './menuCard';
 export {default as MenuCategoriesSection, createMenuCategory} from './menuCategoriesSection';
 export {default as PropertyCard} from './propertyCard';
 export {default as ScreenHeader} from './screenHeader';
+export {default as MeetYourHost} from './meetYourHost';
+export {default as PropertyReviewsSection} from './propertyReviewsSection';

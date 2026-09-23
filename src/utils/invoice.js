@@ -35,6 +35,22 @@ export const formatCurrencyWithDecimals = value => {
   })}`;
 };
 
+export const formatMenuBillItems = response => {
+  const items = Array.isArray(response)
+    ? response
+    : Array.isArray(response?.data)
+    ? response.data
+    : [];
+
+  return items
+    .filter(item => item?.name)
+    .map((item, index) => ({
+      id: `${String(item.name).toLowerCase()}-${index}`,
+      title: item.name,
+      amount: Number(item.price) || 0,
+    }));
+};
+
 export const formatFoodMenuItems = response => {
   const menus = Array.isArray(response)
     ? response

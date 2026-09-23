@@ -71,6 +71,16 @@ const schemas = {
     .min(8, 'ERRORS.MUST_BE_AT_LEAST_8_CHARACTERS')
     .required('ERRORS.REQUIRED'),
   currentPassword: Yup.string().required('ERRORS.REQUIRED'),
+  dateRequired: Yup.mixed()
+    .nullable()
+    .test('required-date', 'ERRORS.REQUIRED', value => {
+      if (!value) {
+        return false;
+      }
+
+      const date = value instanceof Date ? value : new Date(value);
+      return !Number.isNaN(date.getTime());
+    }),
 };
 
 export default {
@@ -91,6 +101,57 @@ export default {
     fields: [fields.email],
     schema: Yup.object().shape({
       email: schemas.email,
+    }),
+  },
+  CREATE_BOOKING: {
+    fields: [
+      {
+        label: 'CREATE_BOOKING.FULL_NAME',
+        placeholder: 'CREATE_BOOKING.FULL_NAME_PLACEHOLDER',
+        type: 'fullName',
+      },
+      {
+        label: 'CREATE_BOOKING.EMAIL',
+        placeholder: 'CREATE_BOOKING.EMAIL_PLACEHOLDER',
+        type: 'email',
+        keyboardType: 'email-address',
+      },
+      {
+        label: 'CREATE_BOOKING.PHONE',
+        placeholder: 'CREATE_BOOKING.PHONE_PLACEHOLDER',
+        type: 'phone',
+        keyboardType: 'phone-pad',
+        maxLength: 10,
+      },
+      {
+        label: 'CREATE_BOOKING.BOOKING_AMOUNT',
+        placeholder: 'CREATE_BOOKING.BOOKING_AMOUNT_PLACEHOLDER',
+        type: 'bookingAmount',
+        keyboardType: 'decimal-pad',
+      },
+      {
+        label: 'CREATE_BOOKING.ADVANCE_PAYMENT',
+        placeholder: 'CREATE_BOOKING.ADVANCE_PAYMENT_PLACEHOLDER',
+        type: 'advancePayment',
+        keyboardType: 'decimal-pad',
+      },
+    ],
+    schema: Yup.object().shape({
+      homestayId: schemas.stringRequired,
+      homestayTitle: schemas.stringOptional,
+      checkIn: schemas.dateRequired,
+      checkOut: schemas.dateRequired,
+      fullName: schemas.stringRequired2,
+      email: schemas.emailOptional,
+      phone: schemas.phoneRequired,
+      bookingAmount: Yup.string()
+        .required('ERRORS.REQUIRED')
+        .test(
+          'positive-amount',
+          'ERRORS.REQUIRED',
+          value => Number(value) > 0,
+        ),
+      advancePayment: Yup.string().optional().nullable(),
     }),
   },
 };

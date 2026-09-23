@@ -5,6 +5,9 @@ const ENDPOINTS = {
   DASHBOARD: '/dashboard/host',
   BILLS: '/bills',
   MY_PROPERTIES: '/homestays/host/my-listings',
+  HOST_LISTING_DETAIL: '/homestays/host/listings',
+  REVIEWS: '/reviews',
+  HOST_PENDING_REVIEWS: '/reviews/host/pending',
   FOOD_MENU:"/food-menus"
 };
 
@@ -64,6 +67,26 @@ const baseQuery = fetchBaseQuery({
           params: data,
         }),
       }),
+      getPropertyDetail: builder.query({
+        query: id => ({
+          url: `${ENDPOINTS.HOST_LISTING_DETAIL}/${id}`,
+          method: 'GET',
+        }),
+      }),
+      getPropertyReviews: builder.query({
+        query: params => ({
+          url: ENDPOINTS.REVIEWS,
+          method: 'GET',
+          params,
+        }),
+      }),
+      getHostPendingReviews: builder.query({
+        query: params => ({
+          url: ENDPOINTS.HOST_PENDING_REVIEWS,
+          method: 'GET',
+          params,
+        }),
+      }),
       getFoodMenu: builder.query({
         query: (data) => ({
           url: ENDPOINTS.FOOD_MENU,
@@ -74,4 +97,12 @@ const baseQuery = fetchBaseQuery({
     }),
   });
 
-  export const {useGetDashboardQuery, useGetBillsQuery, useGetMyPropertiesQuery, useGetFoodMenuQuery} = tabsApi;
+  export const {
+    useGetDashboardQuery,
+    useGetBillsQuery,
+    useGetMyPropertiesQuery,
+    useGetPropertyDetailQuery,
+    useGetPropertyReviewsQuery,
+    useGetHostPendingReviewsQuery,
+    useGetFoodMenuQuery,
+  } = tabsApi;

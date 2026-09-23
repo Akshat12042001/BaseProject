@@ -1,0 +1,185 @@
+import {StyleSheet} from 'react-native';
+import {COLORS, FONTS} from '../../../constants';
+
+export default StyleSheet.create({
+  screen: {
+    backgroundColor: COLORS.BACKGROUND,
+    flex: 1,
+  },
+  scrollContent: {
+    paddingBottom: 62,
+    paddingHorizontal: 14,
+    paddingTop: 16,
+  },
+  tabs: {
+    borderBottomColor: COLORS.BORDER_LIGHT,
+    borderBottomWidth: 1,
+    flexDirection: 'row',
+    marginBottom: 16,
+  },
+  tab: {
+    marginRight: 24,
+    paddingBottom: 10,
+  },
+  activeTab: {
+    borderBottomColor: COLORS.LOGIN_PRIMARY,
+    borderBottomWidth: 2,
+  },
+  card: {
+    backgroundColor: COLORS.SURFACE,
+    borderColor: COLORS.BORDER_LIGHT,
+    borderRadius: 12,
+    borderWidth: 1,
+    marginBottom: 14,
+    padding: 16,
+  },
+  cardTitle: {
+    marginBottom: 4,
+  },
+  cardSubtitle: {
+    marginBottom: 14,
+  },
+  logoPreviewBox: {
+    alignItems: 'center',
+    backgroundColor: COLORS.INVOICE_FORM_MUTED,
+    borderColor: COLORS.BORDER_LIGHT,
+    borderRadius: 10,
+    borderStyle: 'dashed',
+    borderWidth: 1,
+    justifyContent: 'center',
+    minHeight: 140,
+    padding: 20,
+  },
+  currentLogoImage: {
+    height: 72,
+    maxWidth: '100%',
+    width: 200,
+  },
+  emptyLogoText: {
+    textAlign: 'center',
+  },
+  uploadZone: {
+    alignItems: 'center',
+    backgroundColor: COLORS.INVOICE_FORM_MUTED,
+    borderColor: COLORS.BORDER_LIGHT,
+    borderRadius: 10,
+    borderStyle: 'dashed',
+    borderWidth: 1,
+    paddingHorizontal: 16,
+    paddingVertical: 24,
+  },
+  uploadIconWrap: {
+    alignItems: 'center',
+    backgroundColor: COLORS.INVOICE_FORM_BADGE,
+    borderRadius: 24,
+    height: 48,
+    justifyContent: 'center',
+    marginBottom: 12,
+    width: 48,
+  },
+  uploadTitle: {
+    marginBottom: 4,
+  },
+  uploadHint: {
+    marginBottom: 16,
+    textAlign: 'center',
+  },
+  selectedPreview: {
+    borderRadius: 8,
+    height: 64,
+    marginBottom: 14,
+    width: 160,
+  },
+  chooseButton: {
+    alignItems: 'center',
+    backgroundColor: COLORS.SURFACE,
+    borderColor: COLORS.LOGIN_PRIMARY,
+    borderRadius: 8,
+    borderWidth: 1,
+    flexDirection: 'row',
+    gap: 8,
+    justifyContent: 'center',
+    minWidth: 160,
+    paddingHorizontal: 18,
+    paddingVertical: 10,
+  },
+  submitButton: {
+    borderRadius: 8,
+    // height: 48,
+    marginTop: 16,
+  },
+  createSubtitle: {
+    marginBottom: 16,
+  },
+  field: {
+    marginBottom: 12,
+  },
+  lastField: {
+    marginBottom: 14,
+  },
+  descriptionInput: {
+    minHeight: 110,
+    textAlignVertical: 'top',
+  },
+  noteBanner: {
+    backgroundColor: COLORS.INVOICE_FORM_BADGE,
+    borderColor: COLORS.INVOICE_PAID_TEXT,
+    borderRadius: 8,
+    borderWidth: 1,
+    marginBottom: 16,
+    paddingHorizontal: 12,
+    paddingVertical: 12,
+  },
+  noteText: {
+    color: COLORS.LOGIN_PRIMARY,
+    fontFamily: FONTS.regular,
+    fontSize: 12,
+    lineHeight: 18,
+  },
+  noteTextBold: {
+    fontFamily: FONTS.bold,
+  },
+  createButton: {
+    borderRadius: 8,
+    // height: 48,
+  },
+  generatedLogoImage: {
+    height: 72,
+    marginBottom: 10,
+    maxWidth: '100%',
+    width: 200,
+  },
+  generatedLogoName: {
+    textAlign: 'center',
+  },
+  logoActionRow: {
+    flexDirection: 'row',
+    gap: 10,
+    justifyContent: 'flex-end',
+    marginTop: 14,
+  },
+  setActiveButton: {
+    alignItems: 'center',
+    backgroundColor: COLORS.LOGIN_PRIMARY,
+    borderRadius: 8,
+    flexDirection: 'row',
+    gap: 6,
+    justifyContent: 'center',
+    minHeight: 40,
+    minWidth: 132,
+    paddingHorizontal: 14,
+    paddingVertical: 10,
+  },
+  rejectButton: {
+    alignItems: 'center',
+    backgroundColor: COLORS.INVOICE_DELETE,
+    borderRadius: 8,
+    flexDirection: 'row',
+    gap: 6,
+    justifyContent: 'center',
+    minHeight: 40,
+    minWidth: 96,
+    paddingHorizontal: 14,
+    paddingVertical: 10,
+  },
+});

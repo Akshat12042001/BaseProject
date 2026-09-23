@@ -16,7 +16,7 @@ import {makeLoginRequest, makeSendOtpByEmailRequest, makeVerifyOtpByEmailRequest
 import {setIsLoggedIn, setUserData} from '../../../redux/auth/auth.reducer';
 import styles from './styles';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
-import { successToast } from '../../../utils/alerts';
+import {successToast} from '../../../utils/alerts';
 import { VerifyOtpModal } from '../../../components/modals';
 
 const LOGIN_METHODS = {
@@ -105,7 +105,7 @@ const LoginScreen = ({navigation}) => {
         successToast(response.message);
       }, 1000);
     } catch (error) {
-      console.warn('Verify OTP failed', error);
+      throw error;
     } finally {
       setIsVerifyingOtp(false);
     }

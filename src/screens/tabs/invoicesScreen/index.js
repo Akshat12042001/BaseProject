@@ -88,8 +88,8 @@ const InvoicesScreen = () => {
       return (
         <InvoiceCard
           id={item.id}
-          initials={getInitials(item.from)}
-          name={item.from}
+          initials={getInitials(item.to)}
+          name={item.to}
           status={formatInvoiceStatus(item.status)}
           statusType={isSettled ? 'paid' : 'draft'}
           dates={formatDateRange(item.checkIn, item.checkOut)}

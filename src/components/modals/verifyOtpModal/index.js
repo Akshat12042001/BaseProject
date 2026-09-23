@@ -40,13 +40,21 @@ const VerifyOtpModal = ({
     setError('');
   }, []);
 
-  const handleVerify = useCallback(() => {
+  const handleVerify = useCallback(async () => {
     if (!isOtpComplete) {
       setError(t('VERIFY_OTP_MODAL.INVALID_OTP'));
       return;
     }
 
-    onVerify?.(otp.join(''));
+    try {
+      setError('');
+      await onVerify?.(otp.join(''));
+    } catch (verifyError) {
+      setError(
+        verifyError?.response?.data?.message ||
+          t('VERIFY_OTP_MODAL.INVALID_OTP'),
+      );
+    }
   }, [isOtpComplete, onVerify, otp, t]);
 
   const handleResend = useCallback(async () => {

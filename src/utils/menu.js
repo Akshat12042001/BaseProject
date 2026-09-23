@@ -52,7 +52,7 @@ export const formatMenuDescription = (menu, t) => {
       defaultValue:
         templateKey.charAt(0) + templateKey.slice(1).toLowerCase(),
     }) || templateKey;
-  const itemCount = getMenuItemCount(menu);
+  const itemCount = menu?.itemCount || 0;
   const itemsLabel = t(
     itemCount === 1 ? 'MENU.ITEM_COUNT_ONE' : 'MENU.ITEM_COUNT_OTHER',
     {count: itemCount},

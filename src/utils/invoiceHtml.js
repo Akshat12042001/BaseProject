@@ -11,15 +11,22 @@ const escapeHtml = value =>
 const formatText = value => escapeHtml(value).replace(/\n/g, '<br />');
 
 const formatDate = value =>
-  value && moment(value).isValid() ? moment(value).format('MMM DD, YYYY') : '-';
+  value && moment(value).isValid() ? moment(value).format('MMM D, YYYY') : '-';
 
 const formatAmount = value => {
   const amount = Number(value) || 0;
-  return `Rs ${amount.toLocaleString('en-IN', {
+  return `₹${amount.toLocaleString('en-IN', {
     minimumFractionDigits: 2,
     maximumFractionDigits: 2,
   })}`;
 };
+
+const getBusinessName = value => String(value ?? '').split('\n')[0].trim();
+
+const createLogoMarkup = (logoUrl, businessName) =>
+  logoUrl
+    ? `<img class="brand-logo" src="${escapeHtml(logoUrl)}" alt="${escapeHtml(businessName || 'Homestay logo')}" />`
+    : '';
 
 const createItemRows = items =>
   items
@@ -30,10 +37,10 @@ const createItemRows = items =>
 
       return `
         <tr>
-          <td>${escapeHtml(item.name)}</td>
-          <td>${quantity}</td>
-          <td>${formatAmount(rate)}</td>
-          <td>${formatAmount(amount)}</td>
+          <td class="col-item">${escapeHtml(item.name)}</td>
+          <td class="col-qty">${quantity}</td>
+          <td class="col-rate">${formatAmount(rate)}</td>
+          <td class="col-amount amount-bold">${formatAmount(amount)}</td>
         </tr>
       `;
     })
@@ -47,21 +54,25 @@ const createDiscountRow = discount => {
   const discountRate = String(discount.name || '').replace('%', '').trim();
 
   return `
-    <div class="total-row">
-      <span>Discount (${Number(discountRate) || 0}%):</span>
+    <div class="summary-row">
+      <span>Discount (${Number(discountRate) || 0}%)</span>
       <span>${formatAmount(discount.price)}</span>
     </div>
   `;
 };
 
-const BOONIES_LOGO_URL = 'https://www.boonies.in/Final-boonies-logo.png';
+const createNotesSection = notes => {
+  if (!String(notes || '').trim()) {
+    return '';
+  }
 
-const getBusinessName = value => String(value ?? '').split('\n')[0].trim();
-
-const createLogoMarkup = logoUrl =>
-  logoUrl
-    ? `<img class="homestay-logo" src="${escapeHtml(logoUrl)}" alt="Homestay logo" />`
-    : '';
+  return `
+    <section class="notes">
+      <div class="notes-label">Notes</div>
+      <p>${formatText(notes)}</p>
+    </section>
+  `;
+};
 
 export const createInvoiceHtml = invoice => {
   const items = Array.isArray(invoice?.billItems) ? invoice.billItems : [];
@@ -89,9 +100,9 @@ export const createInvoiceHtml = invoice => {
             margin: 0;
             background: #ffffff;
             color: #111111;
-            font-family: Arial, Helvetica, sans-serif;
-            font-size: 12px;
-            line-height: 1.45;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+            font-size: 13px;
+            line-height: 1.5;
             -webkit-print-color-adjust: exact;
             print-color-adjust: exact;
           }
@@ -100,49 +111,30 @@ export const createInvoiceHtml = invoice => {
             display: flex;
             flex-direction: column;
             min-height: 297mm;
-            padding: 16mm 18mm;
-            position: relative;
+            padding: 28px 36px 24px;
             width: 210mm;
-          }
-
-          .invoice-content {
-            position: relative;
-            z-index: 1;
-          }
-
-          .watermark {
-            left: 50%;
-            opacity: 0.06;
-            pointer-events: none;
-            position: absolute;
-            top: 52%;
-            transform: translate(-50%, -50%);
-            width: 220px;
-            z-index: 0;
           }
 
           .header {
             align-items: flex-start;
             display: flex;
             justify-content: space-between;
+            margin-bottom: 36px;
           }
 
-          .brand {
-            max-width: 52%;
-          }
-
-          .homestay-logo {
+          .brand-logo {
             display: block;
             height: auto;
-            margin-bottom: 10px;
-            max-height: 56px;
-            max-width: 180px;
+            max-height: 42px;
+            max-width: 160px;
             object-fit: contain;
           }
 
           .business-name {
-            font-size: 18px;
-            font-weight: 700;
+            color: #111111;
+            font-size: 14px;
+            font-weight: 400;
+            margin-top: 10px;
           }
 
           .invoice-heading {
@@ -150,123 +142,178 @@ export const createInvoiceHtml = invoice => {
           }
 
           .invoice-heading h1 {
-            font-size: 32px;
+            font-size: 28px;
+            font-weight: 700;
+            letter-spacing: 0.5px;
             line-height: 1;
-            margin: 0 0 8px;
+            margin: 0;
           }
 
           .invoice-number {
+            color: #8a8a8a;
             font-size: 13px;
+            margin-top: 8px;
           }
 
-          .details {
+          .meta-section {
+            border-bottom: 1px solid #e8e8e8;
             display: grid;
             gap: 24px;
-            grid-template-columns: 1fr 1.1fr;
-            margin-top: 38px;
-          }
-
-          .label {
-            font-size: 11px;
-            font-weight: 700;
-            margin-bottom: 4px;
-          }
-
-          .detail-row {
-            display: grid;
-            gap: 16px;
             grid-template-columns: 1fr 1fr;
-            margin-bottom: 10px;
+            margin-bottom: 0;
+            padding-bottom: 22px;
           }
 
-          .detail-row span:first-child {
-            text-align: right;
+          .bill-to-label {
+            color: #8a8a8a;
+            font-size: 10px;
+            font-weight: 600;
+            letter-spacing: 0.8px;
+            margin-bottom: 6px;
+            text-transform: uppercase;
           }
 
-          .detail-row span:last-child {
-            text-align: right;
-          }
-
-          .balance-row {
-            background: #f1f1f1;
+          .bill-to-name {
+            font-size: 16px;
             font-weight: 700;
-            padding: 6px 10px;
           }
 
-          table {
+          .meta-right {
+            text-align: right;
+          }
+
+          .meta-row {
+            color: #111111;
+            display: flex;
+            font-size: 13px;
+            justify-content: flex-end;
+            margin-bottom: 6px;
+          }
+
+          .meta-row span:first-child {
+            color: #8a8a8a;
+            margin-right: 10px;
+            min-width: 108px;
+            text-align: right;
+          }
+
+          .meta-row span:last-child {
+            min-width: 120px;
+            text-align: right;
+          }
+
+          .balance-highlight {
+            border-top: 1px solid #e8e8e8;
+            margin-top: 10px;
+            padding-top: 12px;
+          }
+
+          .balance-highlight .meta-row span:first-child {
+            color: #8a8a8a;
+            font-size: 12px;
+          }
+
+          .balance-highlight .balance-amount {
+            font-size: 18px;
+            font-weight: 700;
+          }
+
+          .items-table {
             border-collapse: collapse;
-            margin-top: 48px;
+            margin-top: 0;
             width: 100%;
           }
 
-          th {
-            background: #434343;
-            color: #ffffff;
-            font-size: 11px;
-            padding: 8px 10px;
-            text-align: left;
+          .items-table thead th {
+            border-bottom: 1px solid #e8e8e8;
+            color: #8a8a8a;
+            font-size: 10px;
+            font-weight: 600;
+            letter-spacing: 0.8px;
+            padding: 14px 0 10px;
+            text-transform: uppercase;
           }
 
-          td {
-            padding: 8px 10px;
+          .items-table tbody td {
+            border-bottom: 1px solid #e8e8e8;
+            font-size: 14px;
+            padding: 16px 0;
             vertical-align: top;
           }
 
-          th:nth-child(1),
-          td:nth-child(1) {
-            width: 38%;
-          }
-
-          th:nth-child(2),
-          td:nth-child(2) {
-            width: 18%;
-          }
-
-          th:nth-child(3),
-          td:nth-child(3),
-          th:nth-child(4),
-          td:nth-child(4) {
-            width: 22%;
-          }
-
-          .totals {
-            margin-left: auto;
-            margin-top: 28px;
+          .col-item {
+            text-align: left;
             width: 42%;
           }
 
-          .total-row {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 12px;
+          .col-qty {
+            text-align: center;
+            width: 16%;
           }
 
-          .grand-total {
+          .col-rate,
+          .col-amount {
+            text-align: right;
+            width: 21%;
+          }
+
+          .amount-bold {
             font-weight: 700;
+          }
+
+          .summary {
+            margin-left: auto;
             margin-top: 18px;
+            width: 280px;
           }
 
-          .additional-info {
-            margin-top: 64px;
+          .summary-row {
+            display: flex;
+            font-size: 14px;
+            justify-content: space-between;
+            margin-bottom: 8px;
           }
 
-          .info-section {
-            margin-bottom: 30px;
+          .summary-row span:first-child {
+            color: #111111;
           }
 
-          .info-section h2 {
-            font-size: 12px;
-            margin: 0 0 8px;
+          .summary-divider {
+            border-top: 1px solid #e8e8e8;
+            margin: 10px 0 12px;
           }
 
-          .info-section p {
+          .summary-row.total-row,
+          .summary-row.balance-row {
+            font-size: 15px;
+            font-weight: 700;
+            margin-bottom: 10px;
+          }
+
+          .notes {
+            margin-top: 36px;
+          }
+
+          .notes-label {
+            color: #8a8a8a;
+            font-size: 10px;
+            font-weight: 600;
+            letter-spacing: 0.8px;
+            margin-bottom: 6px;
+            text-transform: uppercase;
+          }
+
+          .notes p {
+            color: #444444;
+            font-size: 13px;
             margin: 0;
             white-space: normal;
           }
 
           .powered-by {
-            color: #666666;
+            color: #9a9a9a;
             font-size: 11px;
+            font-style: italic;
             margin-top: auto;
             padding-top: 48px;
             text-align: center;
@@ -275,17 +322,10 @@ export const createInvoiceHtml = invoice => {
       </head>
       <body>
         <main class="invoice">
-          <img
-            class="watermark"
-            src="${escapeHtml(BOONIES_LOGO_URL)}"
-            alt="Boonies watermark"
-          />
-
-          <div class="invoice-content">
           <header class="header">
             <div class="brand">
-              ${createLogoMarkup(homestayLogo)}
-              <div class="business-name">${formatText(businessName)}</div>
+              ${createLogoMarkup(homestayLogo, businessName)}
+              ${businessName ? `<div class="business-name">${formatText(businessName)}</div>` : ''}
             </div>
             <div class="invoice-heading">
               <h1>INVOICE</h1>
@@ -293,38 +333,40 @@ export const createInvoiceHtml = invoice => {
             </div>
           </header>
 
-          <section class="details">
+          <section class="meta-section">
             <div>
-              <div class="label">Bill To:</div>
-              <div>${formatText(invoice?.to)}</div>
+              <div class="bill-to-label">Bill To</div>
+              <div class="bill-to-name">${formatText(invoice?.to)}</div>
             </div>
-            <div>
-              <div class="detail-row">
-                <span>Date:</span>
+            <div class="meta-right">
+              <div class="meta-row">
+                <span>Date</span>
                 <span>${formatDate(invoice?.createdAt)}</span>
               </div>
-              <div class="detail-row">
-                <span>Payment Terms:</span>
+              <div class="meta-row">
+                <span>Payment Terms</span>
                 <span>${formatText(invoice?.payment_terms) || '-'}</span>
               </div>
-              <div class="detail-row">
-                <span>Due Date:</span>
+              <div class="meta-row">
+                <span>Due Date</span>
                 <span>${formatDate(invoice?.checkOut)}</span>
               </div>
-              <div class="detail-row balance-row">
-                <span>Balance Due:</span>
-                <span>${formatAmount(invoice?.amountDue)}</span>
+              <div class="balance-highlight">
+                <div class="meta-row">
+                  <span>Balance Due</span>
+                  <span class="balance-amount">${formatAmount(invoice?.amountDue)}</span>
+                </div>
               </div>
             </div>
           </section>
 
-          <table>
+          <table class="items-table">
             <thead>
               <tr>
-                <th>Item</th>
-                <th>Quantity</th>
-                <th>Rate</th>
-                <th>Amount</th>
+                <th class="col-item">Item</th>
+                <th class="col-qty">Quantity</th>
+                <th class="col-rate">Rate</th>
+                <th class="col-amount">Amount</th>
               </tr>
             </thead>
             <tbody>
@@ -332,29 +374,28 @@ export const createInvoiceHtml = invoice => {
             </tbody>
           </table>
 
-          <section class="totals">
-            <div class="total-row">
-              <span>Subtotal:</span>
+          <section class="summary">
+            <div class="summary-row">
+              <span>Subtotal</span>
               <span>${formatAmount(invoice?.subTotal)}</span>
             </div>
-            <div class="total-row">
-              <span>Tax (${Number(invoice?.taxRate) || 0}%):</span>
+            <div class="summary-row">
+              <span>Tax (${Number(invoice?.taxRate) || 0}%)</span>
               <span>${formatAmount(invoice?.gst)}</span>
             </div>
             ${createDiscountRow(invoice?.discount)}
-            <div class="total-row grand-total">
-              <span>Total:</span>
+            <div class="summary-divider"></div>
+            <div class="summary-row total-row">
+              <span>Total</span>
               <span>${formatAmount(invoice?.total)}</span>
+            </div>
+            <div class="summary-row balance-row">
+              <span>Balance Due</span>
+              <span>${formatAmount(invoice?.amountDue)}</span>
             </div>
           </section>
 
-          <section class="additional-info">
-            <div class="info-section">
-              <h2>Notes</h2>
-              <p>${formatText(invoice?.notes) || '-'}</p>
-            </div>
-          </section>
-          </div>
+          ${createNotesSection(invoice?.notes)}
 
           <footer class="powered-by">Powered by Boonies</footer>
         </main>

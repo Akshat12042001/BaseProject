@@ -6,13 +6,13 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
-import {useFocusEffect} from '@react-navigation/native';
+import {useFocusEffect, useNavigation} from '@react-navigation/native';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import {useTranslation} from 'react-i18next';
 import {ScreenContainer, StyledText} from '../../../components/atoms';
 import {PropertyCard} from '../../../components/molecules';
 import {PlusIcon} from '../../../components/svgs';
-import {COLORS} from '../../../constants';
+import {COLORS, NAVIGATION} from '../../../constants';
 import {useGetMyPropertiesQuery} from '../../../redux/tabs';
 import {
   getProperties,
@@ -27,6 +27,7 @@ const PropertySeparator = () => <View style={styles.separator} />;
 
 const PropertiesScreen = () => {
   const {t} = useTranslation();
+  const navigation = useNavigation();
   const insets = useSafeAreaInsets();
   const {
     data: propertiesResponse,
@@ -68,9 +69,15 @@ const PropertiesScreen = () => {
         pricePerDay={item.pricePerDay}
         status={item.status}
         placeholder={t('HOME.PROPERTY_PHOTO')}
+        onPress={() =>
+          navigation.navigate(NAVIGATION.STACKS.COMMON, {
+            screen: NAVIGATION.COMMON.PROPERTY_DETAIL_SCREEN,
+            params: {propertyId: item.id},
+          })
+        }
       />
     ),
-    [t],
+    [navigation, t],
   );
 
   const renderEmpty = useCallback(() => {

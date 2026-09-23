@@ -4,12 +4,13 @@ import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import {useTranslation} from 'react-i18next';
 import {useDispatch, useSelector} from 'react-redux';
 import {ScreenContainer, StyledText} from '../../../components/atoms';
-import {ChevronRightIcon} from '../../../components/svgs';
+import {CalendarIcon, ChevronRightIcon} from '../../../components/svgs';
 import {makeLogoutRequest} from '../../../api/auth';
 import {COLORS} from '../../../constants';
 import {reset} from '../../../redux/auth/auth.reducer';
 import {showAlert} from '../../../utils/alerts';
 import styles from './styles';
+import DATA from './config';
 
 const MoreScreen = () => {
   const {t} = useTranslation();
@@ -48,6 +49,16 @@ const MoreScreen = () => {
     });
   }, [handleLogoutConfirm, t]);
 
+  const onPress = id => {
+    switch (id) {
+      case 1:
+        // navigation.navigate('Bookings');
+        break;
+      case 2:
+        handleLogoutPress();
+        break;
+    }
+  };
   return (
     <ScreenContainer noPaddingTop noPaddingBottom>
       <View style={styles.screen}>
@@ -63,22 +74,28 @@ const MoreScreen = () => {
           </StyledText>
         </View>
 
-        <View style={styles.content}>
-          <TouchableOpacity
-            accessibilityRole="button"
-            disabled={isLoggingOut}
-            onPress={handleLogoutPress}
-            style={[styles.logoutRow, isLoggingOut && styles.disabledRow]}>
-            <StyledText color={COLORS.RED_ERROR} variant="semiBold" size={14}>
-              {t('MORE.LOGOUT')}
-            </StyledText>
-            {isLoggingOut ? (
-              <ActivityIndicator color={COLORS.RED_ERROR} size="small" />
-            ) : (
-              <ChevronRightIcon color={COLORS.RED_ERROR} />
-            )}
-          </TouchableOpacity>
-        </View>
+        {DATA.map(item => (
+          <View style={styles.content} key={item.id}>
+            <TouchableOpacity
+              accessibilityRole="button"
+              disabled={isLoggingOut}
+              onPress={onPress.bind(null, item.id)}
+              style={[styles.logoutRow, isLoggingOut && styles.disabledRow]}>
+              {item.icon}
+              <View style={styles.logoutRowContent}>
+                <StyledText
+                  color={item.id === 1 ? COLORS.PRIMARY : COLORS.RED_ERROR}
+                  variant="semiBold"
+                  size={14}>
+                  {item.title}
+                </StyledText>
+                <ChevronRightIcon
+                  color={item.id === 1 ? COLORS.PRIMARY : COLORS.RED_ERROR}
+                />
+              </View>
+            </TouchableOpacity>
+          </View>
+        ))}
       </View>
     </ScreenContainer>
   );

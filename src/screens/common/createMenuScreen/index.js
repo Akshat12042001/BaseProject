@@ -21,7 +21,7 @@ import {
 } from '../../../components/svgs';
 import {MenuPdfPreviewModal} from '../../../components/modals';
 import {makeCreateFoodMenuRequest, makeGetSingleFoodMenuRequest, makeUpdateFoodMenuRequest} from '../../../api/common';
-import {ASSETS, COLORS} from '../../../constants';
+import {ASSETS, COLORS, NAVIGATION} from '../../../constants';
 import {buildMenuPayload, formatMenuDetails} from '../../../utils/menu';
 import {createMenuPdfFile} from '../../../utils/menuPdf';
 import {errorToast, successToast} from '../../../utils/alerts';
@@ -258,6 +258,10 @@ const CreateMenuScreen = () => {
     [selectedTemplate],
   );
 
+  const handleSelectLogo = useCallback(() => {
+    navigation.navigate(NAVIGATION.COMMON.CREATE_LOGO_SCREEN);
+  }, [navigation]);
+
   return (
     <ScreenContainer noPaddingTop noPaddingBottom>
       <ScreenHeader
@@ -314,6 +318,7 @@ const CreateMenuScreen = () => {
             </StyledText>
 
             <TouchableOpacity
+              onPress={handleSelectLogo}
               accessibilityRole="button"
               style={styles.logoRow}>
               <View style={styles.logoPlaceholder}>

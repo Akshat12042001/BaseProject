@@ -15,6 +15,7 @@ const InvoiceItemDropdown = ({
   showAmount = true,
   onChangeText,
   onSelectItem,
+  containerStyle,
 }) => {
   const [isFocused, setIsFocused] = useState(false);
 
@@ -68,7 +69,7 @@ const InvoiceItemDropdown = ({
   );
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, containerStyle]}>
       <StyledText
         color={isFocused ? COLORS.LOGIN_PRIMARY : COLORS.GREYSCALE_500}
         size={12}
