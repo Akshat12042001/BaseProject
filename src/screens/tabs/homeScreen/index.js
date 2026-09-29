@@ -3,7 +3,7 @@ import {FlatList, ScrollView, TouchableOpacity, View} from 'react-native';
 import Skeleton from 'react-native-reanimated-skeleton';
 import {useTranslation} from 'react-i18next';
 import {ScreenContainer, StyledText} from '../../../components/atoms';
-import {PropertyCard} from '../../../components/molecules';
+import {PROPERTY_CARD_ACTION, PropertyCard} from '../../../components/molecules';
 import {
   ArrowRightIcon,
   BellIcon,
@@ -12,7 +12,6 @@ import {
   CalendarIcon,
   MenuIcon,
   ReceiptIcon,
-  ShopIcon,
   StarIcon,
   UserPlusIcon,
 } from '../../../components/svgs';
@@ -33,18 +32,18 @@ const STATS_SKELETON_LAYOUT = [
     key: 'stats-row-one',
     flexDirection: 'row',
     justifyContent: 'space-between',
-    marginTop: 12,
+    marginTop: 8,
     children: [
       {
         key: 'stat-card-0',
         width: SCREEN.WIDTH / 2 - 28,
-        height: 118,
+        height: 88,
         borderRadius: 12,
       },
       {
         key: 'stat-card-1',
         width: SCREEN.WIDTH / 2 - 28,
-        height: 118,
+        height: 88,
         borderRadius: 12,
       },
     ],
@@ -53,18 +52,18 @@ const STATS_SKELETON_LAYOUT = [
     key: 'stats-row-two',
     flexDirection: 'row',
     justifyContent: 'space-between',
-    marginTop: 10,
+    marginTop: 8,
     children: [
       {
         key: 'stat-card-2',
         width: SCREEN.WIDTH / 2 - 28,
-        height: 118,
+        height: 88,
         borderRadius: 12,
       },
       {
         key: 'stat-card-3',
         width: SCREEN.WIDTH / 2 - 28,
-        height: 118,
+        height: 88,
         borderRadius: 12,
       },
     ],
@@ -142,7 +141,6 @@ const HomeScreen = () => {
         iconColor: '#D46D58',
         iconBackground: '#FDEFEA',
         valueColor: '#D46D58',
-        matchRewardsHeight: true,
       },
       {
         id: 'rewards',
@@ -158,7 +156,6 @@ const HomeScreen = () => {
         iconColor: '#C9A227',
         iconBackground: '#FBF4DF',
         valueColor: '#C9A227',
-        showRedeem: true,
       },
     ],
     [quickStats, t],
@@ -253,24 +250,45 @@ const HomeScreen = () => {
     }
   }, [fetchMe, user?.accessToken]);
 
+  const openPropertyDetail = useCallback(
+    (propertyId, isListingView = false) => {
+      navigation.navigate(NAVIGATION.STACKS.COMMON, {
+        screen: NAVIGATION.COMMON.PROPERTY_DETAIL_SCREEN,
+        params: {propertyId, isListingView},
+      });
+    },
+    [navigation],
+  );
+
+  const handlePropertyMenuAction = useCallback(
+    (action, propertyId) => {
+      if (action === PROPERTY_CARD_ACTION.PREVIEW) {
+        openPropertyDetail(propertyId);
+        return;
+      }
+
+      if (action === PROPERTY_CARD_ACTION.VIEW_LISTING) {
+        openPropertyDetail(propertyId, true);
+      }
+    },
+    [openPropertyDetail],
+  );
+
   const renderProperty = useCallback(
     ({item}) => (
       <PropertyCard
         compact
+        id={item.id}
         title={item.title}
         city={item.city}
         totalBedrooms={item.totalBedrooms}
         imageUrl={item.primaryImageUrl}
         placeholder={t('HOME.PROPERTY_PHOTO')}
-        onPress={() =>
-          navigation.navigate(NAVIGATION.STACKS.COMMON, {
-            screen: NAVIGATION.COMMON.PROPERTY_DETAIL_SCREEN,
-            params: {propertyId: item.id},
-          })
-        }
+        onPress={() => openPropertyDetail(item.id)}
+        onMenuAction={handlePropertyMenuAction}
       />
     ),
-    [navigation, t],
+    [handlePropertyMenuAction, openPropertyDetail, t],
   );
 
   const renderQuickStatCard = useCallback(
@@ -282,46 +300,31 @@ const HomeScreen = () => {
       iconColor,
       iconBackground,
       valueColor,
-      showRedeem,
-      matchRewardsHeight,
     }) => (
       <View style={styles.quickStatCard}>
-        <View style={styles.quickStatContent}>
-          <View style={[styles.quickStatIconWrap, {backgroundColor: iconBackground}]}>
-            <Icon color={iconColor} size={17} />
-          </View>
-          <StyledText
-            color={COLORS.TEXT_SECONDARY}
-            size={10}
-            variant="medium"
-            textStyle={styles.quickStatLabel}>
-            {label}
-          </StyledText>
-          <StyledText
-            variant="bold"
-            size={18}
-            color={valueColor}
-            textStyle={styles.quickStatValue}>
-            {value}
-          </StyledText>
-          <StyledText color={COLORS.TEXT_MUTED} size={10} variant="medium">
-            {subtitle}
-          </StyledText>
+        <View style={[styles.quickStatIconWrap, {backgroundColor: iconBackground}]}>
+          <Icon color={iconColor} size={15} />
         </View>
-        {showRedeem ? (
-          <TouchableOpacity activeOpacity={0.8} style={styles.redeemButton}>
-            <ShopIcon color="#C9A227" size={12} />
-            <StyledText color="#C9A227" variant="semiBold" size={10}>
-              {t('HOME.STATS.REDEEM_IN_SHOP')}
-            </StyledText>
-            <ArrowRightIcon color="#C9A227" size={12} />
-          </TouchableOpacity>
-        ) : matchRewardsHeight ? (
-          <View style={styles.redeemSpacer} />
-        ) : null}
+        <StyledText
+          color={COLORS.TEXT_SECONDARY}
+          size={9}
+          variant="medium"
+          textStyle={styles.quickStatLabel}>
+          {label}
+        </StyledText>
+        <StyledText
+          variant="bold"
+          size={16}
+          color={valueColor}
+          textStyle={styles.quickStatValue}>
+          {value}
+        </StyledText>
+        <StyledText color={COLORS.TEXT_MUTED} size={9} variant="medium">
+          {subtitle}
+        </StyledText>
       </View>
     ),
-    [t],
+    [],
   );
 
   const renderManageTool = useCallback(
@@ -331,18 +334,18 @@ const HomeScreen = () => {
         onPress={onPress}
         style={styles.manageToolCard}>
         <View style={[styles.manageToolIconWrap, {backgroundColor: background}]}>
-          <Icon color={color} size={17} />
+          <Icon color={color} size={15} />
         </View>
         <View style={styles.manageToolCopy}>
-          <StyledText variant="bold" size={12} numberOfLines={1}>
+          <StyledText variant="bold" size={11} numberOfLines={1}>
             {title}
           </StyledText>
-          <StyledText color={COLORS.TEXT_SECONDARY} size={9} numberOfLines={2}>
+          <StyledText color={COLORS.TEXT_SECONDARY} size={8} numberOfLines={2}>
             {description}
           </StyledText>
         </View>
         <View style={[styles.manageToolAction, {backgroundColor: color}]}>
-          <ArrowRightIcon color={COLORS.WHITE} size={14} />
+          <ArrowRightIcon color={COLORS.WHITE} size={12} />
         </View>
       </TouchableOpacity>
     ),
@@ -353,33 +356,24 @@ const HomeScreen = () => {
     <ScreenContainer noPaddingTop noPaddingBottom>
       <View style={styles.screen}>
         <View style={headerStyle}>
-          <View style={styles.brandRow}>
-            <View>
-              <StyledText variant="bold" size={18} color={COLORS.SURFACE}>
-                {t('HOME.BRAND')}
+          <View style={styles.greetingRow}>
+            <View style={styles.greetingText}>
+              <StyledText color={COLORS.TEXT_SECONDARY} size={10}>
+                {moment().format('dddd, MMMM D')}
               </StyledText>
-              <StyledText variant="medium" size={10} color={COLORS.TEXT_SECONDARY}>
-                {t('HOME.TAGLINE')}
+              <StyledText
+                color={COLORS.SURFACE}
+                variant="bold"
+                size={24}
+                lineHeight={28}
+                containerStyle={styles.greeting}>
+                {t(greetingKey, {name: user?.firstName})}
               </StyledText>
             </View>
             <View style={styles.notification}>
               <BellIcon />
             </View>
           </View>
-          <StyledText
-            color={COLORS.TEXT_SECONDARY}
-            size={10}
-            containerStyle={styles.date}>
-            {moment().format('dddd, MMMM D')}
-          </StyledText>
-          <StyledText
-            color={COLORS.SURFACE}
-            variant="bold"
-            size={24}
-            lineHeight={28}
-            containerStyle={styles.greeting}>
-            {t(greetingKey, {name: user?.firstName})}
-          </StyledText>
         </View>
 
         <ScrollView

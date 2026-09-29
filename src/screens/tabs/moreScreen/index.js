@@ -6,17 +6,20 @@ import {useDispatch, useSelector} from 'react-redux';
 import {ScreenContainer, StyledText} from '../../../components/atoms';
 import {CalendarIcon, ChevronRightIcon} from '../../../components/svgs';
 import {makeLogoutRequest} from '../../../api/auth';
-import {COLORS} from '../../../constants';
+import {COLORS, NAVIGATION} from '../../../constants';
 import {reset} from '../../../redux/auth/auth.reducer';
 import {showAlert} from '../../../utils/alerts';
 import styles from './styles';
 import DATA from './config';
+import {useNavigation} from '@react-navigation/native';
 
 const MoreScreen = () => {
   const {t} = useTranslation();
   const dispatch = useDispatch();
   const insets = useSafeAreaInsets();
   const user = useSelector(state => state.auth.user);
+  const navigation = useNavigation();
+
   const [isLoggingOut, setIsLoggingOut] = useState(false);
 
   const headerStyle = useMemo(
@@ -52,7 +55,9 @@ const MoreScreen = () => {
   const onPress = id => {
     switch (id) {
       case 1:
-        // navigation.navigate('Bookings');
+        navigation.navigate(NAVIGATION.STACKS.COMMON,{
+          screen: NAVIGATION.COMMON.BOOKING_SCREEN,
+        });
         break;
       case 2:
         handleLogoutPress();

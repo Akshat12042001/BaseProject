@@ -12,6 +12,9 @@ const ENDPOINTS = {
   HOST_PENDING_REVIEWS: '/reviews/host/pending',
   HOMESTAY_BOOKING_CALENDAR: '/bookings/homestays',
   DIRECT_BOOKING_BY_HOST: '/deals/direct-booking/by/host',
+  HOST_DIRECT_BOOKINGS: '/deals/host/direct-bookings',
+  HOST_BOOKINGS: '/deals/host/bookings',
+  DEAL_PREVIEW: '/deals',
 };
 
 
@@ -86,6 +89,18 @@ export const makeUpdateBillRequest = (id, data) => {
     .then(res => res.data);
 };
 
+export const makeUpdateBillStatusRequest = id => {
+  return APIClient()
+    .put(`${ENDPOINTS.BILLS}/status/${id}`)
+    .then(res => res.data);
+};
+
+export const makeDeleteBillRequest = id => {
+  return APIClient()
+    .delete(`${ENDPOINTS.BILLS}/${id}`)
+    .then(res => res.data);
+};
+
 export const makeGetSingleFoodMenuRequest = (id) => {
   return APIClient()
     .get(`${ENDPOINTS.FOOD_MENU}/${id}`)
@@ -95,6 +110,18 @@ export const makeGetSingleFoodMenuRequest = (id) => {
 export const makeUpdateFoodMenuRequest = (id, data) => {
   return APIClient()
     .patch(`${ENDPOINTS.FOOD_MENU}/${id}`, data)
+    .then(res => res.data);
+};
+
+export const makeUpdateFoodMenuActiveRequest = (id, isActive) => {
+  return APIClient()
+    .patch(`${ENDPOINTS.FOOD_MENU}/${id}/active`, {isActive: Boolean(isActive)})
+    .then(res => res.data);
+};
+
+export const makeDeleteFoodMenuRequest = id => {
+  return APIClient()
+    .delete(`${ENDPOINTS.FOOD_MENU}/${id}`)
     .then(res => res.data);
 };
 
@@ -150,8 +177,38 @@ export const makeGetHomestayCalendarRequest = (homestayId, params) => {
     .then(res => res.data);
 };
 
+export const makeGetHomestayBlockedDatesRequest = homestayId => {
+  return APIClient()
+    .get(`${ENDPOINTS.HOMESTAY_BOOKING_CALENDAR}/${homestayId}/blocked-dates`)
+    .then(res => res.data);
+};
+
 export const makeCreateDirectBookingRequest = data => {
   return APIClient()
     .post(ENDPOINTS.DIRECT_BOOKING_BY_HOST, data)
+    .then(res => res.data);
+};
+
+export const makeGetHostDirectBookingsRequest = params => {
+  return APIClient()
+    .get(ENDPOINTS.HOST_DIRECT_BOOKINGS, {params})
+    .then(res => res.data);
+};
+
+export const makeDeleteHostBookingRequest = bookingId => {
+  return APIClient()
+    .delete(`${ENDPOINTS.HOST_BOOKINGS}/${bookingId}`)
+    .then(res => res.data);
+};
+
+export const makeUpdateHostBookingRequest = (bookingId, data) => {
+  return APIClient()
+    .patch(`${ENDPOINTS.HOST_BOOKINGS}/${bookingId}`, data)
+    .then(res => res.data);
+};
+
+export const makeGetBookingPreviewRequest = bookingId => {
+  return APIClient()
+    .get(`${ENDPOINTS.DEAL_PREVIEW}/${bookingId}/preview`)
     .then(res => res.data);
 };

@@ -2,8 +2,8 @@ import React from 'react';
 import Svg, {Line, Path} from 'react-native-svg';
 import {COLORS} from '../../constants';
 
-const ReceiptIcon = ({color = COLORS.SURFACE, ...props}) => (
-  <Svg width={24} height={24} viewBox="0 0 24 24" fill="none" {...props}>
+const ReceiptIcon = ({color = COLORS.SURFACE, size = 24, ...props}) => (
+  <Svg width={size} height={size} viewBox="0 0 24 24" fill="none" {...props}>
     <Path
       d="M7 3.5h10v17l-2-1.35L13 20.5l-2-1.35L9 20.5l-2-1.35V3.5Z"
       stroke={color}

@@ -1,6 +1,7 @@
-import React, {useMemo} from 'react';
+import React, {useCallback, useMemo, useState} from 'react';
 import {Image, TouchableOpacity, View} from 'react-native';
 import {useTranslation} from 'react-i18next';
+import Popover, {PopoverPlacement} from 'react-native-popover-view';
 import {StyledText} from '../../atoms';
 import {
   BathroomIcon,
@@ -15,7 +16,10 @@ import {
   formatPropertyPrice,
   formatPropertyStatus,
 } from '../../../utils/property';
+import {PROPERTY_CARD_ITEMS} from './config';
 import styles from './styles';
+
+const MENU_ICON_SIZE = 18;
 
 const STRIPES = [-80, -52, -24, 4, 32, 60, 88, 116, 144];
 
@@ -29,6 +33,7 @@ const PropertyFeature = ({Icon, label}) => (
 );
 
 const PropertyCard = ({
+  id,
   title,
   city,
   state,
@@ -42,9 +47,26 @@ const PropertyCard = ({
   placeholder,
   compact = false,
   onPress,
-  onMenuPress,
+  onMenuAction,
 }) => {
   const {t} = useTranslation();
+  const [isMenuVisible, setIsMenuVisible] = useState(false);
+
+  const handleOpenMenu = useCallback(() => {
+    setIsMenuVisible(true);
+  }, []);
+
+  const handleCloseMenu = useCallback(() => {
+    setIsMenuVisible(false);
+  }, []);
+
+  const handleMenuItemPress = useCallback(
+    action => {
+      setIsMenuVisible(false);
+      onMenuAction?.(action, id);
+    },
+    [id, onMenuAction],
+  );
 
   const location = useMemo(
     () => formatPropertyLocation(city, state),
@@ -89,18 +111,55 @@ const PropertyCard = ({
         </View>
       )}
 
-      {!compact && (
-        <TouchableOpacity
-          accessibilityRole="button"
-          accessibilityLabel={t('PROPERTIES.MORE_OPTIONS')}
-          disabled={!onMenuPress}
-          onPress={onMenuPress}
-          style={styles.menuButton}>
-          <View style={styles.menuIcon}>
-            <MoreIcon color={COLORS.TEXT} />
-          </View>
-        </TouchableOpacity>
-      )}
+      <Popover
+        isVisible={isMenuVisible}
+        arrowSize={{width: 0, height: 0}}
+        backgroundStyle={styles.popoverBackdrop}
+        displayAreaInsets={{top: 16, bottom: 16, left: 16, right: 16}}
+        onRequestClose={handleCloseMenu}
+        placement={PopoverPlacement.BOTTOM}
+        popoverStyle={styles.popover}
+        from={
+          <TouchableOpacity
+            accessibilityRole="button"
+            accessibilityLabel={t('PROPERTIES.MORE_OPTIONS')}
+            onPress={handleOpenMenu}
+            style={[styles.menuButton, compact && styles.compactMenuButton]}>
+            <View style={styles.menuIcon}>
+              <MoreIcon color={COLORS.TEXT} />
+            </View>
+          </TouchableOpacity>
+        }>
+        <View style={styles.menuList}>
+          {PROPERTY_CARD_ITEMS.map(item => {
+            const iconColor = item.destructive
+              ? COLORS.INVOICE_DELETE
+              : COLORS.GREYSCALE_900;
+            const textColor = item.destructive
+              ? COLORS.INVOICE_DELETE
+              : COLORS.TEXT;
+
+            return (
+              <TouchableOpacity
+                key={item.action}
+                accessibilityRole="button"
+                onPress={() => handleMenuItemPress(item.action)}
+                style={styles.menuItem}>
+                <View style={styles.menuItemIcon}>
+                  <item.Icon color={iconColor} size={MENU_ICON_SIZE} />
+                </View>
+                <StyledText
+                  color={textColor}
+                  size={14}
+                  variant="medium"
+                  containerStyle={styles.menuItemLabel}>
+                  {t(item.labelKey)}
+                </StyledText>
+              </TouchableOpacity>
+            );
+          })}
+        </View>
+      </Popover>
     </View>
   );
 
@@ -204,4 +263,5 @@ const PropertyCard = ({
   );
 };
 
+export {PROPERTY_CARD_ACTION} from './config';
 export default React.memo(PropertyCard);

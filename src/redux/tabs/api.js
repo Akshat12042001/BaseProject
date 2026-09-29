@@ -8,7 +8,8 @@ const ENDPOINTS = {
   HOST_LISTING_DETAIL: '/homestays/host/listings',
   REVIEWS: '/reviews',
   HOST_PENDING_REVIEWS: '/reviews/host/pending',
-  FOOD_MENU:"/food-menus"
+  FOOD_MENU: '/food-menus',
+  HOST_DIRECT_BOOKINGS: '/deals/host/direct-bookings',
 };
 
 
@@ -94,6 +95,37 @@ const baseQuery = fetchBaseQuery({
           params: data,
         }),
       }),
+      getHostDirectBookings: builder.query({
+        query: data => ({
+          url: ENDPOINTS.HOST_DIRECT_BOOKINGS,
+          method: 'GET',
+          params: data,
+        }),
+        serializeQueryArgs: ({endpointName}) => endpointName,
+        merge: (currentCache, newResponse, {arg}) => {
+          if (arg.page === 1) {
+            return newResponse;
+          }
+
+          const existingIds = new Set(
+            currentCache.data.map(booking => booking.id),
+          );
+          const nextBookings = newResponse.data.filter(
+            booking => !existingIds.has(booking.id),
+          );
+
+          currentCache.data.push(...nextBookings);
+          currentCache.meta = newResponse.meta;
+        },
+        forceRefetch: ({currentArg, previousArg}) =>
+          currentArg?.page !== previousArg?.page ||
+          currentArg?.limit !== previousArg?.limit ||
+          currentArg?.search !== previousArg?.search ||
+          currentArg?.checkInFrom !== previousArg?.checkInFrom ||
+          currentArg?.checkOutFrom !== previousArg?.checkOutFrom ||
+          currentArg?.sortBy !== previousArg?.sortBy ||
+          currentArg?.sortOrder !== previousArg?.sortOrder,
+      }),
     }),
   });
 
@@ -105,4 +137,5 @@ const baseQuery = fetchBaseQuery({
     useGetPropertyReviewsQuery,
     useGetHostPendingReviewsQuery,
     useGetFoodMenuQuery,
+    useGetHostDirectBookingsQuery,
   } = tabsApi;

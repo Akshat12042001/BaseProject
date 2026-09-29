@@ -139,3 +139,13 @@ export const buildMenuPayload = ({
         })),
     })),
 });
+
+export const buildMenuPayloadFromDetails = details =>
+  buildMenuPayload({
+    title: details?.title || '',
+    tagline: details?.tagline || '',
+    phoneNumber: details?.phoneNumber || '',
+    kitchenTiming: details?.kitchenTiming || '',
+    templateId: details?.templateId || null,
+    categories: Array.isArray(details?.categories) ? details.categories : [],
+  });

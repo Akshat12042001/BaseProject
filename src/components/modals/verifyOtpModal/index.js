@@ -60,16 +60,19 @@ const VerifyOtpModal = ({
   const handleResend = useCallback(async () => {
     try {
       setIsResending(true);
-      await makeSendOtpByEmailRequest({email});
+      if (onResend) {
+        await onResend();
+      } else {
+        await makeSendOtpByEmailRequest({email});
+      }
       setOtp([]);
       setError('');
-      onResend?.();
     } catch (error) {
       console.warn('Resend OTP failed', error);
     } finally {
       setIsResending(false);
     }
-  }, [onResend, email]);
+  }, [email, onResend]);
 
   return (
     <Modal

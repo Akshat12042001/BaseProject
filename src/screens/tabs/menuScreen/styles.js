@@ -48,4 +48,7 @@ export default StyleSheet.create({
     minHeight: 160,
     paddingHorizontal: 20,
   },
+  skeletonContainer: {
+    width: '100%',
+  },
 });

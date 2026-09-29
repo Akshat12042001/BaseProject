@@ -56,6 +56,15 @@ export default StyleSheet.create({
   sectionTitle: {
     marginBottom: 12,
   },
+  fieldError: {
+    marginTop: 8,
+    paddingHorizontal: 2,
+  },
+  categoriesError: {
+    marginBottom: 10,
+    marginTop: -2,
+    paddingHorizontal: 4,
+  },
   logoRow: {
     alignItems: 'center',
     backgroundColor: COLORS.INVOICE_FORM_MUTED,
@@ -117,16 +126,6 @@ export default StyleSheet.create({
     flex: 1,
     height: 47,
     justifyContent: 'center',
-  },
-  shareButton: {
-    alignItems: 'center',
-    backgroundColor: COLORS.SURFACE,
-    borderColor: COLORS.INVOICE_FORM_FIELD_BORDER,
-    borderRadius: 7,
-    borderWidth: 1,
-    height: 47,
-    justifyContent: 'center',
-    width: 47,
   },
   disabledButton: {
     opacity: 0.65,

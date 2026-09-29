@@ -5,3 +5,5 @@ export {default as CustomButton} from './customButton';
 export {default as CustomToast} from './customToast';
 export {default as OtpInput} from './otpInput';
 export {default as MaterialIcon} from './materialIcon';
+export {default as AnimatedSwitch} from './animatedSwitch';
+export {default as ActionLoadingOverlay} from './actionLoadingOverlay';

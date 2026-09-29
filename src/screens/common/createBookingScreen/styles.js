@@ -5,6 +5,11 @@ export default StyleSheet.create({
   flex: {
     flex: 1,
   },
+  loadingContainer: {
+    alignItems: 'center',
+    flex: 1,
+    justifyContent: 'center',
+  },
   scrollContent: {
     backgroundColor: COLORS.LOGIN_BACKGROUND,
     paddingHorizontal: 16,

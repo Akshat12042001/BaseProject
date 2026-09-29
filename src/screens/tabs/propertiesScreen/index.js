@@ -10,7 +10,7 @@ import {useFocusEffect, useNavigation} from '@react-navigation/native';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import {useTranslation} from 'react-i18next';
 import {ScreenContainer, StyledText} from '../../../components/atoms';
-import {PropertyCard} from '../../../components/molecules';
+import {PROPERTY_CARD_ACTION, PropertyCard} from '../../../components/molecules';
 import {PlusIcon} from '../../../components/svgs';
 import {COLORS, NAVIGATION} from '../../../constants';
 import {useGetMyPropertiesQuery} from '../../../redux/tabs';
@@ -55,9 +55,34 @@ const PropertiesScreen = () => {
 
   const subtitle = t('PROPERTIES.SUBTITLE', {count: properties.length});
 
+  const openPropertyDetail = useCallback(
+    (propertyId, isListingView = false) => {
+      navigation.navigate(NAVIGATION.STACKS.COMMON, {
+        screen: NAVIGATION.COMMON.PROPERTY_DETAIL_SCREEN,
+        params: {propertyId, isListingView},
+      });
+    },
+    [navigation],
+  );
+
+  const handleMenuAction = useCallback(
+    (action, propertyId) => {
+      if (action === PROPERTY_CARD_ACTION.PREVIEW) {
+        openPropertyDetail(propertyId);
+        return;
+      }
+
+      if (action === PROPERTY_CARD_ACTION.VIEW_LISTING) {
+        openPropertyDetail(propertyId, true);
+      }
+    },
+    [openPropertyDetail],
+  );
+
   const renderProperty = useCallback(
     ({item}) => (
       <PropertyCard
+        id={item.id}
         title={item.title}
         city={item.city}
         state={item.state}
@@ -69,15 +94,11 @@ const PropertiesScreen = () => {
         pricePerDay={item.pricePerDay}
         status={item.status}
         placeholder={t('HOME.PROPERTY_PHOTO')}
-        onPress={() =>
-          navigation.navigate(NAVIGATION.STACKS.COMMON, {
-            screen: NAVIGATION.COMMON.PROPERTY_DETAIL_SCREEN,
-            params: {propertyId: item.id},
-          })
-        }
+        onPress={() => openPropertyDetail(item.id)}
+        onMenuAction={handleMenuAction}
       />
     ),
-    [navigation, t],
+    [handleMenuAction, openPropertyDetail, t],
   );
 
   const renderEmpty = useCallback(() => {

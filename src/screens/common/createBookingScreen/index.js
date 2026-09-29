@@ -1,6 +1,6 @@
 import React, {useCallback, useEffect, useMemo, useRef, useState} from 'react';
 import {ActivityIndicator, TouchableOpacity, View} from 'react-native';
-import {useNavigation} from '@react-navigation/native';
+import {useNavigation, useRoute} from '@react-navigation/native';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import {useTranslation} from 'react-i18next';
 import {Formik} from 'formik';
@@ -13,14 +13,19 @@ import {CalendarIcon, CheckIcon, MinusIcon, PlusIcon} from '../../../components/
 import {COLORS, FORM_SCHEMA} from '../../../constants';
 import {
   makeCreateDirectBookingRequest,
+  makeGetBookingPreviewRequest,
   makeGetHomestayCalendarRequest,
   makeGetHostListingsDropdownRequest,
+  makeUpdateHostBookingRequest,
 } from '../../../api/common';
 import {errorToast, successToast} from '../../../utils/alerts';
 import {
   buildDirectBookingNote,
   buildDirectBookingPayload,
+  buildUpdateHostBookingPayload,
+  excludeStayDatesFromUnavailable,
   findListingByTitle,
+  formatBookingEditFormData,
   formatHostListingsDropdown,
   getDefaultCheckOutDate,
   getHomestayCalendarQueryRange,
@@ -167,12 +172,18 @@ const MealCheckboxRow = ({title, subtitle, checked, isLast = false, onToggle}) =
 
 const CreateBookingScreen = () => {
   const navigation = useNavigation();
+  const route = useRoute();
   const {t} = useTranslation();
   const insets = useSafeAreaInsets();
   const inputRefs = useRef(FORM_SCHEMA.CREATE_BOOKING.fields.map(() => null));
+  const bookingId = route.params?.bookingId;
+  const isEditMode = !!bookingId;
 
   const [listingOptions, setListingOptions] = useState([]);
   const [isListingsLoading, setIsListingsLoading] = useState(true);
+  const [isPrefillLoading, setIsPrefillLoading] = useState(isEditMode);
+  const [initialValues, setInitialValues] = useState(EMPTY_VALUES);
+  const [editStayRange, setEditStayRange] = useState(null);
   const [maxGuests, setMaxGuests] = useState(DEFAULT_MAX_GUESTS);
   const [activeDateField, setActiveDateField] = useState(null);
   const [adults, setAdults] = useState(1);
@@ -202,6 +213,16 @@ const CreateBookingScreen = () => {
     }
   }, []);
 
+  const calendarUnavailableDates = useMemo(
+    () =>
+      excludeStayDatesFromUnavailable(
+        unavailableDates,
+        editStayRange?.checkIn,
+        editStayRange?.checkOut,
+      ),
+    [editStayRange, unavailableDates],
+  );
+
   const maxAdults = useMemo(
     () => Math.max(1, maxGuests - children),
     [children, maxGuests],
@@ -220,7 +241,7 @@ const CreateBookingScreen = () => {
         setIsListingsLoading(true);
         const response = await makeGetHostListingsDropdownRequest({
           page: 1,
-          limit: 9,
+          limit: isEditMode ? 100 : 9,
         });
         if (isMounted) {
           setListingOptions(formatHostListingsDropdown(response));
@@ -241,7 +262,87 @@ const CreateBookingScreen = () => {
     return () => {
       isMounted = false;
     };
-  }, []);
+  }, [isEditMode]);
+
+  useEffect(() => {
+    if (!isEditMode || isListingsLoading) {
+      return;
+    }
+
+    let isMounted = true;
+
+    const prefillBooking = async () => {
+      try {
+        setIsPrefillLoading(true);
+        const response = await makeGetBookingPreviewRequest(bookingId);
+        const editData = formatBookingEditFormData(response);
+
+        if (!isMounted) {
+          return;
+        }
+
+        if (!editData) {
+          errorToast(t('CREATE_BOOKING.LOAD_ERROR'));
+          navigation.goBack();
+          return;
+        }
+
+        const matchedListing =
+          findListingByTitle(listingOptions, editData.homestayTitle) ||
+          (editData.homestayId
+            ? listingOptions.find(
+                listing => String(listing.id) === String(editData.homestayId),
+              )
+            : null);
+
+        const resolvedHomestayId =
+          matchedListing?.id || editData.homestayId || '';
+
+        setInitialValues({
+          ...editData.formValues,
+          homestayId: resolvedHomestayId,
+          homestayTitle:
+            matchedListing?.title || editData.homestayTitle || '',
+        });
+        setAdults(editData.adults);
+        setChildren(editData.children);
+        setPets(editData.pets);
+        setBreakfastIncluded(editData.breakfastIncluded);
+        setDinnerIncluded(editData.dinnerIncluded);
+        setEditStayRange({
+          checkIn: editData.checkInString,
+          checkOut: editData.checkOutString,
+        });
+        setMaxGuests(matchedListing?.maxGuests || DEFAULT_MAX_GUESTS);
+
+        if (resolvedHomestayId) {
+          fetchHomestayCalendar(resolvedHomestayId);
+        }
+      } catch {
+        if (isMounted) {
+          navigation.goBack();
+        }
+      } finally {
+        if (isMounted) {
+          setIsPrefillLoading(false);
+        }
+      }
+    };
+
+    prefillBooking();
+
+    return () => {
+      isMounted = false;
+    };
+  }, [
+    bookingId,
+    fetchHomestayCalendar,
+    isEditMode,
+    isListingsLoading,
+    listingOptions,
+    navigation,
+    t,
+  ]);
 
   useEffect(() => {
     setAdults(current => Math.min(current, maxAdults));
@@ -272,14 +373,13 @@ const CreateBookingScreen = () => {
         const checkOut =
           values.checkOut ||
           (values.checkIn
-            ? resolveDefaultCheckOutDate(values.checkIn, unavailableDates)
+            ? resolveDefaultCheckOutDate(values.checkIn, calendarUnavailableDates)
             : null);
 
-        const payload = buildDirectBookingPayload({
+        const payloadArgs = {
           homestayId: values.homestayId,
           fullName: values.fullName,
           email: values.email,
-          phone: values.phone,
           checkIn: values.checkIn,
           checkOut,
           adults,
@@ -290,11 +390,27 @@ const CreateBookingScreen = () => {
           breakfastIncluded,
           dinnerIncluded,
           note: buildDirectBookingNote(t),
-        });
+        };
 
-        const response = await makeCreateDirectBookingRequest(payload);
+        const response = isEditMode
+          ? await makeUpdateHostBookingRequest(
+              bookingId,
+              buildUpdateHostBookingPayload(payloadArgs),
+            )
+          : await makeCreateDirectBookingRequest(
+              buildDirectBookingPayload({
+                ...payloadArgs,
+                phone: values.phone,
+              }),
+            );
+
         successToast(
-          response?.message || t('CREATE_BOOKING.CREATED_SUCCESSFULLY'),
+          response?.message ||
+            t(
+              isEditMode
+                ? 'CREATE_BOOKING.UPDATED_SUCCESSFULLY'
+                : 'CREATE_BOOKING.CREATED_SUCCESSFULLY',
+            ),
         );
         navigation.goBack();
       } catch {
@@ -305,13 +421,15 @@ const CreateBookingScreen = () => {
     },
     [
       adults,
+      bookingId,
       breakfastIncluded,
+      calendarUnavailableDates,
       children,
       dinnerIncluded,
+      isEditMode,
       navigation,
       pets,
       t,
-      unavailableDates,
     ],
   );
 
@@ -319,10 +437,25 @@ const CreateBookingScreen = () => {
   const fieldFocus = COLORS.LOGIN_PRIMARY;
   const bookingForm = FORM_SCHEMA.CREATE_BOOKING;
 
+  if (isPrefillLoading) {
+    return (
+      <ScreenContainer noPaddingTop noPaddingBottom>
+        <ScreenHeader
+          title={t('CREATE_BOOKING.EDIT_TITLE')}
+          backAccessibilityLabel={t('CREATE_BOOKING.BACK')}
+          onBack={handleBack}
+        />
+        <View style={styles.loadingContainer}>
+          <ActivityIndicator color={COLORS.LOGIN_PRIMARY} size="large" />
+        </View>
+      </ScreenContainer>
+    );
+  }
+
   return (
     <ScreenContainer noPaddingTop noPaddingBottom>
       <ScreenHeader
-        title={t('CREATE_BOOKING.TITLE')}
+        title={t(isEditMode ? 'CREATE_BOOKING.EDIT_TITLE' : 'CREATE_BOOKING.TITLE')}
         backAccessibilityLabel={t('CREATE_BOOKING.BACK')}
         onBack={handleBack}
       />
@@ -331,7 +464,7 @@ const CreateBookingScreen = () => {
         validateOnChange
         enableReinitialize
         onSubmit={handleSubmit}
-        initialValues={EMPTY_VALUES}
+        initialValues={initialValues}
         validationSchema={bookingForm.schema}>
         {({
           handleBlur,
@@ -339,6 +472,7 @@ const CreateBookingScreen = () => {
           handleSubmit: submitForm,
           setFieldValue,
           setFieldTouched,
+          validateField,
           values,
           errors,
           touched,
@@ -346,6 +480,7 @@ const CreateBookingScreen = () => {
           const applyHomestaySelection = (listing, title) => {
             setFieldValue('checkIn', null);
             setFieldValue('checkOut', null);
+            setEditStayRange(null);
 
             if (listing?.id) {
               const homestayId = String(listing.id);
@@ -404,7 +539,7 @@ const CreateBookingScreen = () => {
             if (activeDateField === DATE_FIELD.CHECK_IN) {
               const defaultCheckOut = resolveDefaultCheckOutDate(
                 date,
-                unavailableDates,
+                calendarUnavailableDates,
               );
               setFieldValue('checkIn', date, true);
               setFieldValue('checkOut', defaultCheckOut, true);
@@ -420,7 +555,7 @@ const CreateBookingScreen = () => {
           const checkOutDisplayDate =
             values.checkOut ||
             (values.checkIn
-              ? resolveDefaultCheckOutDate(values.checkIn, unavailableDates)
+              ? resolveDefaultCheckOutDate(values.checkIn, calendarUnavailableDates)
               : null);
 
           const checkOutMinimumDate = values.checkIn
@@ -432,7 +567,14 @@ const CreateBookingScreen = () => {
           };
 
           const handleAmountChange = (fieldKey, value) => {
-            setFieldValue(fieldKey, sanitizeDecimal(value));
+            const sanitizedValue = sanitizeDecimal(value);
+
+            setFieldValue(fieldKey, sanitizedValue, true).then(() => {
+              if (fieldKey === 'bookingAmount' && values.advancePayment) {
+                setFieldTouched('advancePayment', true, false);
+                validateField('advancePayment');
+              }
+            });
           };
 
           return (
@@ -660,7 +802,11 @@ const CreateBookingScreen = () => {
                       <ActivityIndicator color={COLORS.WHITE} />
                     ) : (
                       <StyledText color={COLORS.WHITE} variant="semiBold" size={14}>
-                        {t('CREATE_BOOKING.CREATE')}
+                        {t(
+                          isEditMode
+                            ? 'CREATE_BOOKING.UPDATE'
+                            : 'CREATE_BOOKING.CREATE',
+                        )}
                       </StyledText>
                     )}
                   </TouchableOpacity>
@@ -682,9 +828,13 @@ const CreateBookingScreen = () => {
                 minimumDate={
                   activeDateField === DATE_FIELD.CHECK_OUT
                     ? checkOutMinimumDate
+                    : isEditMode &&
+                      values.checkIn &&
+                      moment(values.checkIn).isBefore(moment(), 'day')
+                    ? values.checkIn
                     : new Date()
                 }
-                unavailableDates={unavailableDates}
+                unavailableDates={calendarUnavailableDates}
                 isLoading={isCalendarLoading}
                 onConfirm={handleDateConfirm}
                 onClose={handleDateCancel}

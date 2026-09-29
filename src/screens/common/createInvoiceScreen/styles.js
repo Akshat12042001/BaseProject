@@ -95,17 +95,6 @@ export default StyleSheet.create({
     flexDirection: 'row',
     gap: 8,
   },
-  shareButton: {
-    alignItems: 'center',
-    backgroundColor: COLORS.SURFACE,
-    borderColor: COLORS.INVOICE_FORM_FIELD_BORDER,
-    borderRadius: 7,
-    borderWidth: 1,
-    flex: 1,
-    flexDirection: 'row',
-    height: 47,
-    justifyContent: 'center',
-  },
   saveButton: {
     alignItems: 'center',
     backgroundColor: COLORS.LOGIN_PRIMARY,
@@ -114,9 +103,6 @@ export default StyleSheet.create({
     flexDirection: 'row',
     height: 47,
     justifyContent: 'center',
-  },
-  actionButtonText: {
-    marginLeft: 7,
   },
   disabledButton: {
     opacity: 0.65,

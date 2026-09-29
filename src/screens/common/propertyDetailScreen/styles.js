@@ -70,8 +70,24 @@ export default StyleSheet.create({
   ratingRow: {
     alignItems: 'center',
     flexDirection: 'row',
-    gap: 6,
+    justifyContent: 'space-between',
+    gap: 8,
     marginBottom: 10,
+  },
+  ratingCopy: {
+    alignItems: 'center',
+    flex: 1,
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 6,
+  },
+  chatOwnerButton: {
+    alignItems: 'center',
+    backgroundColor: COLORS.LOGIN_PRIMARY,
+    borderRadius: 8,
+    justifyContent: 'center',
+    paddingHorizontal: 12,
+    paddingVertical: 10,
   },
   locationRow: {
     alignItems: 'center',

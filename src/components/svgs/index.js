@@ -41,4 +41,8 @@ export {default as UserPlusIcon} from './userPlusIcon';
 export {default as StarIcon} from './starIcon';
 export {default as ShopIcon} from './shopIcon';
 export {default as ShareIcon} from './shareIcon';
+export {default as DownloadIcon} from './downloadIcon';
+export {default as DollarCircleIcon} from './dollarCircleIcon';
 export {default as LogoutIcon} from './logoutIcon';
+export {default as TagIcon} from './tagIcon';
+export {default as WhatsAppIcon} from './whatsAppIcon';

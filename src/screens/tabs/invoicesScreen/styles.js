@@ -56,11 +56,11 @@ export default StyleSheet.create({
   },
   list: {
     paddingBottom: 90,
-    paddingHorizontal: 9,
+    paddingHorizontal: 12,
     paddingTop: 14,
   },
   separator: {
-    height: 9,
+    height: 12,
   },
   paginationLoader: {
     alignItems: 'center',

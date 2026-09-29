@@ -69,6 +69,41 @@ export default StyleSheet.create({
     right: 10,
     top: 10,
   },
+  compactMenuButton: {
+    right: 6,
+    top: 6,
+  },
+  popoverBackdrop: {
+    backgroundColor: 'transparent',
+  },
+  popover: {
+    backgroundColor: COLORS.WHITE,
+    borderRadius: 14,
+    elevation: 8,
+    paddingVertical: 6,
+    shadowColor: '#152B1A',
+    shadowOffset: {width: 0, height: 4},
+    shadowOpacity: 0.12,
+    shadowRadius: 12,
+  },
+  menuList: {
+    minWidth: 180,
+  },
+  menuItem: {
+    alignItems: 'center',
+    flexDirection: 'row',
+    paddingHorizontal: 16,
+    paddingVertical: 11,
+  },
+  menuItemIcon: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginRight: 12,
+    width: 22,
+  },
+  menuItemLabel: {
+    flex: 1,
+  },
   menuIcon: {
     alignItems: 'center',
     backgroundColor: COLORS.SURFACE,

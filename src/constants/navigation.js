@@ -6,7 +6,8 @@ export default {
     },
     AUTH: {
         LOGIN_SCREEN: 'Auth-LoginScreen',
-        FORGOT_PASSWORD_SCREEN: 'Auth-ForgotPasswordScreen'
+        FORGOT_PASSWORD_SCREEN: 'Auth-ForgotPasswordScreen',
+        SIGNUP_SCREEN: 'Auth-SignupScreen'
     },
     TABS: {
         HOME_SCREEN: 'Tabs-HomeScreen',
@@ -20,6 +21,7 @@ export default {
         CREATE_MENU_SCREEN: 'Common-CreateMenuScreen',
         CREATE_LOGO_SCREEN: 'Common-CreateLogoScreen',
         PROPERTY_DETAIL_SCREEN: 'Common-PropertyDetailScreen',
-        CREATE_BOOKING_SCREEN: 'Common-CreateBookingScreen'
+        CREATE_BOOKING_SCREEN: 'Common-CreateBookingScreen',
+        BOOKING_SCREEN: 'Common-BookingScreen'
     }
 };

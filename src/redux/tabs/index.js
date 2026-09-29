@@ -7,4 +7,5 @@ export {
     useGetPropertyReviewsQuery,
     useGetHostPendingReviewsQuery,
     useGetFoodMenuQuery,
+    useGetHostDirectBookingsQuery,
   } from './api';

@@ -1,5 +1,5 @@
 import React, {useCallback, useMemo, useRef, useState} from 'react';
-import {Image, TouchableOpacity, View} from 'react-native';
+import {Image, Linking, Text, TouchableOpacity, View} from 'react-native';
 import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
 import {useTranslation} from 'react-i18next';
 import {Formik} from 'formik';
@@ -12,7 +12,7 @@ import {
 } from '../../../components/atoms';
 import {EmailIcon, LockIcon, LoginEyeIcon} from '../../../components/svgs';
 import {COLORS, FORM_SCHEMA, NAVIGATION} from '../../../constants';
-import {makeLoginRequest, makeSendOtpByEmailRequest, makeVerifyOtpByEmailRequest} from '../../../api/auth';
+import {makeLoginRequest, makeSendHostRegistrationOtpRequest, makeSendOtpByEmailRequest, makeVerifyHostRegistrationOtpRequest, makeVerifyOtpByEmailRequest} from '../../../api/auth';
 import {setIsLoggedIn, setUserData} from '../../../redux/auth/auth.reducer';
 import styles from './styles';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
@@ -38,6 +38,7 @@ const LoginScreen = ({navigation}) => {
   const [loginMethod, setLoginMethod] = useState(LOGIN_METHODS.PASSWORD);
   const [isOtpModalVisible, setIsOtpModalVisible] = useState(false);
   const [otpEmail, setOtpEmail] = useState('');
+  const [verificationUserId, setVerificationUserId] = useState('');
   const [isVerifyingOtp, setIsVerifyingOtp] = useState(false);
 
   const isOtpLogin = loginMethod === LOGIN_METHODS.EMAIL_OTP;
@@ -62,6 +63,7 @@ const LoginScreen = ({navigation}) => {
             };
         const response = isOtpLogin ? await makeSendOtpByEmailRequest(params) : await makeLoginRequest(params);
         if(isOtpLogin) {
+          setVerificationUserId('');
           setOtpEmail(values?.email || '');
           setIsOtpModalVisible(true);
         }else{
@@ -70,7 +72,21 @@ const LoginScreen = ({navigation}) => {
           successToast(response.message);
         }
       } catch (error) {
-        console.warn('Login failed', error);
+        const errorData = error?.response?.data;
+        const unverifiedUserId = errorData?.userId;
+
+        if (errorData?.code === 'ACCOUNT_NOT_VERIFIED' && unverifiedUserId) {
+          try {
+            await makeSendHostRegistrationOtpRequest(unverifiedUserId);
+            setVerificationUserId(unverifiedUserId);
+            setOtpEmail(values?.email || '');
+            setIsOtpModalVisible(true);
+          } catch (sendError) {
+            console.warn('Send OTP failed', sendError);
+          }
+        } else {
+          console.warn('Login failed', error);
+        }
       } finally {
         setIsLoading(false);
       }
@@ -94,11 +110,19 @@ const LoginScreen = ({navigation}) => {
     }
   }, [navigation]);
 
+  const handleResendVerificationOtp = useCallback(async () => {
+    const response = await makeSendHostRegistrationOtpRequest(verificationUserId);
+    successToast(response?.message);
+  }, [verificationUserId]);
+
   const handleVerifyOtp = useCallback(async (otp) => {
     try {
       setIsVerifyingOtp(true);
-      const response= await makeVerifyOtpByEmailRequest({email: otpEmail, otp})
+      const response = verificationUserId
+        ? await makeVerifyHostRegistrationOtpRequest(verificationUserId, {otp})
+        : await makeVerifyOtpByEmailRequest({email: otpEmail, otp});
       setIsOtpModalVisible(false);
+      setVerificationUserId('');
       dispatch(setUserData(response));
       dispatch(setIsLoggedIn(true));
       setTimeout(() => {
@@ -109,7 +133,7 @@ const LoginScreen = ({navigation}) => {
     } finally {
       setIsVerifyingOtp(false);
     }
-  }, [otpEmail]);
+  }, [dispatch, otpEmail, verificationUserId]);
   return (
     <ScreenContainer noPaddingBottom noPaddingTop>
       <View style={styles.screen}>
@@ -268,6 +292,13 @@ const LoginScreen = ({navigation}) => {
               </View>
             )}
           </Formik>
+
+          <View style={styles.registerRow}>
+            <Text style={styles.registerTextLink}>Don't have an account?</Text>
+            <TouchableOpacity onPress={() => navigation.navigate(NAVIGATION.AUTH.SIGNUP_SCREEN)}>
+            <Text style={styles.registerText}>Register</Text>
+          </TouchableOpacity>
+          </View>
         </KeyboardAwareScrollView>
       </View>
       <VerifyOtpModal
@@ -275,6 +306,7 @@ const LoginScreen = ({navigation}) => {
         email={otpEmail}
         onCloseModal={() => setIsOtpModalVisible(false)}
         onVerify={handleVerifyOtp}
+        onResend={verificationUserId ? handleResendVerificationOtp : undefined}
         isVerifying={isVerifyingOtp}
       />
     </ScreenContainer>

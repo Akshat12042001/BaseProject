@@ -223,6 +223,21 @@ export const getHostInitial = host => {
 export const formatHostLanguages = languages =>
   (languages || []).filter(Boolean).join(', ');
 
+const slugify = value =>
+  String(value || '')
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '');
+
+export const getPropertyListingUrl = property => {
+  const slug = String(property?.slug || property?.urlSlug || '').trim();
+  const fallback = [slugify(property?.city), slugify(property?.title)]
+    .filter(Boolean)
+    .join('-');
+
+  return `https://www.boonies.in/property/${slug || fallback}`;
+};
+
 export const getPropertyImages = (property, fallbackCount = 5) => {
   const images = (property?.images || [])
     .map(image => image?.imageUrl)

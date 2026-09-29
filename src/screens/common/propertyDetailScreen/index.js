@@ -1,8 +1,9 @@
-import React, {useCallback, useMemo, useState} from 'react';
+import React, {useCallback, useEffect, useMemo, useRef, useState} from 'react';
 import {
   ActivityIndicator,
   FlatList,
   Image,
+  Linking,
   ScrollView,
   TouchableOpacity,
   View,
@@ -10,9 +11,14 @@ import {
 import {useNavigation, useRoute} from '@react-navigation/native';
 import {useTranslation} from 'react-i18next';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
+import moment from 'moment';
 import {MaterialIcon, ScreenContainer, StyledText} from '../../../components/atoms';
-import {AmenitiesModal} from '../../../components/modals';
-import {MeetYourHost, PropertyReviewsSection} from '../../../components/molecules';
+import {AmenitiesModal, BookingCalendarModal} from '../../../components/modals';
+import {
+  MeetYourHost,
+  PropertyInquiryCard,
+  PropertyReviewsSection,
+} from '../../../components/molecules';
 import {
   BackIcon,
   BedIcon,
@@ -23,6 +29,8 @@ import {
   StarIcon,
 } from '../../../components/svgs';
 import {COLORS, SCREEN} from '../../../constants';
+import {makeGetHomestayBlockedDatesRequest} from '../../../api/common';
+import {getBlockedDateStrings} from '../../../utils/booking';
 import {useGetPropertyDetailQuery} from '../../../redux/tabs';
 import {formatPropertyLocation} from '../../../utils/property';
 import {
@@ -32,12 +40,38 @@ import {
   getPropertyAmenities,
   getPropertyDetailData,
   getPropertyImages,
+  getPropertyListingUrl,
   normalizePropertyDetail,
 } from '../../../utils/propertyDetail';
+import {errorToast} from '../../../utils/alerts';
 import styles from './styles';
 
 const VISIBLE_AMENITIES = 6;
 const IMAGE_WIDTH = SCREEN.WIDTH;
+const CHILDREN_CAP = 2;
+const DATE_FIELD = {
+  CHECK_IN: 'checkIn',
+  CHECK_OUT: 'checkOut',
+};
+const MESSAGE_MONTHS = [
+  'Jan',
+  'Feb',
+  'Mar',
+  'Apr',
+  'May',
+  'Jun',
+  'Jul',
+  'Aug',
+  'Sept',
+  'Oct',
+  'Nov',
+  'Dec',
+];
+
+const formatMessageDate = date => {
+  const value = moment(date);
+  return `${value.date()} ${MESSAGE_MONTHS[value.month()]} ${value.year()}`;
+};
 
 const SectionDivider = () => <View style={styles.divider} />;
 
@@ -76,8 +110,19 @@ const PropertyDetailScreen = () => {
   const {t} = useTranslation();
   const [activeImageIndex, setActiveImageIndex] = useState(0);
   const [isAmenitiesModalVisible, setIsAmenitiesModalVisible] = useState(false);
+  const [activeDateField, setActiveDateField] = useState(null);
+  const [checkIn, setCheckIn] = useState(null);
+  const [checkOut, setCheckOut] = useState(null);
+  const [adults, setAdults] = useState(1);
+  const [childrenCount, setChildrenCount] = useState(0);
+  const [blockedDates, setBlockedDates] = useState([]);
+  const [isBlockedDatesLoading, setIsBlockedDatesLoading] = useState(false);
+  const scrollRef = useRef(null);
+  const contentOffset = useRef(0);
+  const inquiryOffset = useRef(0);
 
   const propertyId = route.params?.propertyId;
+  const isListingView = Boolean(route.params?.isListingView);
   const {
     data: propertyResponse,
     isError,
@@ -125,10 +170,113 @@ const PropertyDetailScreen = () => {
   );
   const hasAmenities = amenities.length > 0;
   const hasHost = Boolean(property.host);
+  const maxGuests = Math.max(1, Number(property.maxGuests) || 9);
+  const maxAdults = Math.max(1, maxGuests - childrenCount);
+  const maxChildren = Math.min(CHILDREN_CAP, Math.max(0, maxGuests - adults));
+
+  useEffect(() => {
+    if (!isListingView || !homestayId) {
+      return undefined;
+    }
+
+    let isMounted = true;
+
+    const fetchBlockedDates = async () => {
+      try {
+        setIsBlockedDatesLoading(true);
+        const response = await makeGetHomestayBlockedDatesRequest(homestayId);
+        if (isMounted) {
+          setBlockedDates(getBlockedDateStrings(response));
+        }
+      } catch {
+        if (isMounted) {
+          setBlockedDates([]);
+        }
+      } finally {
+        if (isMounted) {
+          setIsBlockedDatesLoading(false);
+        }
+      }
+    };
+
+    fetchBlockedDates();
+
+    return () => {
+      isMounted = false;
+    };
+  }, [homestayId, isListingView]);
 
   const handleBack = useCallback(() => {
     navigation.goBack();
   }, [navigation]);
+
+  const handleScrollToInquiry = useCallback(() => {
+    scrollRef.current?.scrollTo({
+      y: Math.max(contentOffset.current + inquiryOffset.current - 12, 0),
+      animated: true,
+    });
+  }, []);
+
+  const handleContentLayout = useCallback(event => {
+    contentOffset.current = event.nativeEvent.layout.y;
+  }, []);
+
+  const handleInquiryLayout = useCallback(event => {
+    inquiryOffset.current = event.nativeEvent.layout.y;
+  }, []);
+
+  const handleOpenCheckInPicker = useCallback(() => {
+    setActiveDateField(DATE_FIELD.CHECK_IN);
+  }, []);
+
+  const handleOpenCheckOutPicker = useCallback(() => {
+    if (!checkIn) {
+      setActiveDateField(DATE_FIELD.CHECK_IN);
+      return;
+    }
+
+    setActiveDateField(DATE_FIELD.CHECK_OUT);
+  }, [checkIn]);
+
+  const handleDateConfirm = useCallback(
+    date => {
+      if (activeDateField === DATE_FIELD.CHECK_IN) {
+        setCheckIn(date);
+        if (checkOut && moment(checkOut).isSameOrBefore(date, 'day')) {
+          setCheckOut(null);
+        }
+      } else if (activeDateField === DATE_FIELD.CHECK_OUT) {
+        setCheckOut(date);
+      }
+      setActiveDateField(null);
+    },
+    [activeDateField, checkOut],
+  );
+
+  const handleDateCancel = useCallback(() => {
+    setActiveDateField(null);
+  }, []);
+
+  const handleWhatsAppOwner = useCallback(() => {
+    if (!checkIn || !checkOut || adults < 1) {
+      errorToast(t('PROPERTY_DETAIL.CHAT_DATES_REQUIRED'));
+      return;
+    }
+
+    const phone = String(
+      property.host?.phone ||
+        property.host?.mobile ||
+        property.host?.whatsapp ||
+        property.phone ||
+        '',
+    ).replace(/\D/g, '');
+    const message = `Hi, I found your homestay on Boonies. I'm looking for a stay—can you share price, availability, and photos? Property link: ${getPropertyListingUrl(property)} Checkin date: ${formatMessageDate(checkIn)} Checkout date: ${formatMessageDate(checkOut)}`;
+    const url = phone
+      ? `https://wa.me/${phone}?text=${encodeURIComponent(message)}`
+      : `https://wa.me/?text=${encodeURIComponent(message)}`;
+
+    Linking.openURL(url).catch(() => {});
+  }, [adults, checkIn, checkOut, property, t]);
 
   const handleOpenAmenitiesModal = useCallback(() => {
     setIsAmenitiesModalVisible(true);
@@ -225,6 +373,7 @@ const PropertyDetailScreen = () => {
     <ScreenContainer noPaddingTop noPaddingBottom>
       <View style={styles.screen}>
         <ScrollView
+          ref={scrollRef}
           showsVerticalScrollIndicator={false}
           contentContainerStyle={styles.scrollContent}>
           <View style={styles.gallerySection}>
@@ -263,19 +412,31 @@ const PropertyDetailScreen = () => {
             </View>
           </View>
 
-          <View style={styles.content}>
+          <View style={styles.content} onLayout={handleContentLayout}>
             <StyledText variant="bold" size={22} textStyle={styles.title}>
               {property.title}
             </StyledText>
 
             <View style={styles.ratingRow}>
-              <StarIcon color="#F5B301" size={14} />
-              <StyledText variant="semiBold" size={13}>
-                {rating}
-              </StyledText>
-              <StyledText color={COLORS.TEXT_SECONDARY} size={13}>
-                {t('PROPERTY_DETAIL.GOOGLE_REVIEWS', {count: reviewCount})}
-              </StyledText>
+              <View style={styles.ratingCopy}>
+                <StarIcon color="#F5B301" size={14} />
+                <StyledText variant="semiBold" size={13}>
+                  {rating}
+                </StyledText>
+                <StyledText color={COLORS.TEXT_SECONDARY} size={13}>
+                  {t('PROPERTY_DETAIL.GOOGLE_REVIEWS', {count: reviewCount})}
+                </StyledText>
+              </View>
+              {isListingView ? (
+                <TouchableOpacity
+                  accessibilityRole="button"
+                  onPress={handleScrollToInquiry}
+                  style={styles.chatOwnerButton}>
+                  <StyledText color={COLORS.WHITE} variant="semiBold" size={12}>
+                    {t('PROPERTY_DETAIL.CHAT_WITH_OWNER')}
+                  </StyledText>
+                </TouchableOpacity>
+              ) : null}
             </View>
 
             <View style={styles.locationRow}>
@@ -334,6 +495,26 @@ const PropertyDetailScreen = () => {
                   ))}
                 </View>
               </>
+            ) : null}
+
+            {isListingView ? (
+              <View collapsable={false} onLayout={handleInquiryLayout}>
+                <SectionDivider />
+                <PropertyInquiryCard
+                  pricePerDay={property.pricePerDay}
+                  checkIn={checkIn}
+                  checkOut={checkOut}
+                  adults={adults}
+                  children={childrenCount}
+                  maxAdults={maxAdults}
+                  maxChildren={maxChildren}
+                  onCheckInPress={handleOpenCheckInPicker}
+                  onCheckOutPress={handleOpenCheckOutPicker}
+                  onAdultsChange={setAdults}
+                  onChildrenChange={setChildrenCount}
+                  onChatPress={handleWhatsAppOwner}
+                />
+              </View>
             ) : null}
 
             {hasDescription ? (
@@ -442,6 +623,28 @@ const PropertyDetailScreen = () => {
           amenities={amenities}
           onClose={handleCloseAmenitiesModal}
         />
+        {isListingView ? (
+          <BookingCalendarModal
+            isVisible={!!activeDateField}
+            title={
+              activeDateField === DATE_FIELD.CHECK_OUT
+                ? t('PROPERTY_DETAIL.CHECK_OUT')
+                : t('PROPERTY_DETAIL.CHECK_IN')
+            }
+            selectedDate={
+              activeDateField === DATE_FIELD.CHECK_OUT ? checkOut : checkIn
+            }
+            minimumDate={
+              activeDateField === DATE_FIELD.CHECK_OUT && checkIn
+                ? moment(checkIn).add(1, 'day').toDate()
+                : new Date()
+            }
+            unavailableDates={blockedDates}
+            isLoading={isBlockedDatesLoading}
+            onConfirm={handleDateConfirm}
+            onClose={handleDateCancel}
+          />
+        ) : null}
       </View>
     </ScreenContainer>
   );

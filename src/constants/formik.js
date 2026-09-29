@@ -12,6 +12,34 @@ const fields = {
     type: 'password',
     isPassword: true,
   },
+  firstName: {
+    label: 'LABELS.FIRST_NAME',
+    placeholder: 'PLACEHOLDERS.ENTER_YOUR_FIRST_NAME',
+    type: 'firstName',
+  },
+  lastName: {
+    label: 'LABELS.LAST_NAME',
+    placeholder: 'PLACEHOLDERS.ENTER_YOUR_LAST_NAME',
+    type: 'lastName',
+  },
+  phone: {
+    label: 'LABELS.PHONE',
+    placeholder: 'PLACEHOLDERS.ENTER_YOUR_PHONE',
+    type: 'phone',
+    keyboardType: 'phone-pad',
+    maxLength: 10,
+  },
+  city: {
+    label: 'LABELS.CITY',
+    placeholder: 'PLACEHOLDERS.ENTER_YOUR_CITY',
+    type: 'city',
+  },
+  confirmPassword: {
+    label: 'LABELS.CONFIRM_PASSWORD',
+    placeholder: 'PLACEHOLDERS.ENTER_YOUR_CONFIRM_PASSWORD',
+    type: 'confirmPassword',
+    isPassword: true,
+  },
 };
 
 const schemas = {
@@ -84,6 +112,26 @@ const schemas = {
 };
 
 export default {
+  SIGNUP: {
+    fields: [
+      fields.firstName,
+      fields.lastName,
+      fields.email,
+      fields.phone,
+      fields.password,
+      fields.confirmPassword,
+      fields.city,
+    ],
+    schema: Yup.object().shape({
+      firstName: schemas.stringRequired,
+      lastName: schemas.stringOptional,
+      email: schemas.email,
+      phone: schemas.phoneRequired,
+      password: schemas.stringRequired,
+      confirmPassword: schemas.stringRequired,
+      city: schemas.stringRequired,
+    }),
+  },
   LOGIN: {
     fields: [fields.email, fields.password],
     schema: Yup.object().shape({
@@ -146,12 +194,126 @@ export default {
       phone: schemas.phoneRequired,
       bookingAmount: Yup.string()
         .required('ERRORS.REQUIRED')
+        .test('positive-amount', 'ERRORS.REQUIRED', value => Number(value) > 0),
+      advancePayment: Yup.string()
+        .optional()
+        .nullable()
         .test(
-          'positive-amount',
-          'ERRORS.REQUIRED',
-          value => Number(value) > 0,
+          'not-greater-than-booking-amount',
+          'ERRORS.ADVANCE_EXCEEDS_BOOKING_AMOUNT',
+          function (value) {
+            if (value == null || String(value).trim() === '') {
+              return true;
+            }
+
+            const advanceAmount = Number(value);
+            const bookingAmount = Number(this.parent.bookingAmount);
+
+            if (Number.isNaN(advanceAmount)) {
+              return true;
+            }
+
+            return advanceAmount <= bookingAmount;
+          },
         ),
-      advancePayment: Yup.string().optional().nullable(),
+    }),
+  },
+  CREATE_INVOICE: {
+    fields: [
+      {
+        label: 'CREATE_INVOICE.PAYMENT_TERMS',
+        placeholder: 'CREATE_INVOICE.PAYMENT_TERMS_PLACEHOLDER',
+        type: 'paymentTerms',
+      },
+      {
+        label: 'CREATE_INVOICE.FROM',
+        placeholder: 'CREATE_INVOICE.FROM_PLACEHOLDER',
+        type: 'fromAddress',
+      },
+      {
+        label: 'CREATE_INVOICE.BILL_TO',
+        placeholder: 'CREATE_INVOICE.BILL_TO_PLACEHOLDER',
+        type: 'billTo',
+      },
+      {
+        label: 'CREATE_INVOICE.NOTES',
+        placeholder: 'CREATE_INVOICE.NOTES_PLACEHOLDER',
+        type: 'notes',
+      },
+    ],
+    schema: Yup.object().shape({
+      checkIn: schemas.dateRequired,
+      checkOut: schemas.dateRequired,
+      paymentTerms: schemas.stringRequired,
+      fromAddress: schemas.stringRequired,
+      selectedFromPropertyId: Yup.mixed().nullable().optional(),
+      billTo: schemas.stringRequired2,
+      notes: schemas.stringOptional,
+      taxRate: schemas.stringOptional,
+      discountRate: schemas.stringOptional,
+      amountPaid: schemas.stringOptional,
+      lineItems: Yup.array()
+        .test(
+          'has-valid-line-item',
+          'CREATE_INVOICE.ITEMS_REQUIRED',
+          items =>
+            Array.isArray(items) &&
+            items.some(
+              item =>
+                String(item?.name || '').trim() &&
+                Number(item?.quantity) > 0 &&
+                Number(item?.amount) > 0,
+            ),
+        )
+        .required('CREATE_INVOICE.ITEMS_REQUIRED'),
+    }),
+  },
+  CREATE_MENU: {
+    fields: [
+      {
+        label: 'CREATE_MENU.MENU_NAME',
+        placeholder: 'CREATE_MENU.MENU_NAME_PLACEHOLDER',
+        type: 'menuName',
+      },
+      {
+        label: 'CREATE_MENU.TAGLINE',
+        placeholder: 'CREATE_MENU.TAGLINE_PLACEHOLDER',
+        type: 'tagline',
+      },
+      {
+        label: 'CREATE_MENU.ORDERS_PHONE',
+        placeholder: 'CREATE_MENU.ORDERS_PHONE_PLACEHOLDER',
+        type: 'ordersPhone',
+        keyboardType: 'phone-pad',
+        maxLength: 10,
+      },
+      {
+        label: 'CREATE_MENU.KITCHEN_HOURS',
+        placeholder: 'CREATE_MENU.KITCHEN_HOURS_PLACEHOLDER',
+        type: 'kitchenHours',
+      },
+    ],
+    schema: Yup.object().shape({
+      selectedTemplate: schemas.stringRequired,
+      menuName: schemas.stringRequired2,
+      tagline: schemas.stringOptional,
+      ordersPhone: schemas.phoneRequired,
+      kitchenHours: schemas.stringRequired,
+      logoUrl: schemas.stringOptional,
+      categories: Yup.array()
+        .test(
+          'has-category-with-item',
+          'CREATE_MENU.CATEGORIES_REQUIRED',
+          categories =>
+            Array.isArray(categories) &&
+            categories.some(
+              category =>
+                String(category?.name || '').trim() &&
+                Array.isArray(category?.items) &&
+                category.items.some(item => String(item?.name || '').trim()),
+            ),
+        )
+        .required('CREATE_MENU.CATEGORIES_REQUIRED'),
     }),
   },
 };

@@ -1,3 +1,5 @@
+import moment from 'moment';
+
 const MONTHS = [
   'Jan',
   'Feb',
@@ -99,11 +101,11 @@ export const formatActiveProperties = response => {
 
 export const buildInvoicePayload = ({
   id = '',
-  metadata = {},
   from,
   to,
   paymentTerms,
   lineItems,
+  deletedLineItems = [],
   taxRate,
   discountRate,
   discountAmount,
@@ -115,58 +117,95 @@ export const buildInvoicePayload = ({
   notes,
   checkIn,
   checkOut,
-}) => ({
-  ...(id ? metadata : {}),
-  id,
-  from,
-  to,
-  shippedTo: to,
-  payment_terms: paymentTerms,
-  billItems: lineItems
-    .filter(item => item.name.trim())
-    .map(item => {
-      const price = Number(item.amount) || 0;
-      const quantity = Number(item.quantity) || 0;
-      const billItem = {
-        name: item.name.trim(),
-        price,
-        quantity,
-        total: price * quantity,
-      };
+  metadata = {},
+  status = '',
+  isUpdate = false,
+}) => {
+  const mapBillItem = (item, index, {deleted = false} = {}) => {
+    const price = Number(item.amount ?? item.price) || 0;
+    const quantity = Number(item.quantity) || 0;
+    const serverId = item.serverId || null;
+    const payload = {
+      name: String(item.name || '').trim(),
+      quantity,
+      price,
+      total: price * quantity,
+      sortOrder:
+        item.sortOrder === null || item.sortOrder === undefined
+          ? index
+          : Number(item.sortOrder) || 0,
+    };
 
-      return item.billId
-        ? {
-            id: item.id,
-            billId: item.billId,
-            ...billItem,
-            createdAt: item.createdAt,
-            updatedAt: item.updatedAt,
-          }
-        : billItem;
-    }),
-  taxRate: Number(taxRate) || 0,
-  discount: {
-    isOpen: Boolean(Number(discountRate)),
-    name: `${Number(discountRate) || 0}%`,
-    price: Number(discountAmount) || 0,
-  },
-  shipping: {
-    isOpen: false,
-    name: '',
-    price: 0,
-  },
-  subTotal: subtotal,
-  gst: taxAmount,
-  total,
-  amountPaid: Number(amountPaid) || 0,
-  amountDue: balanceDue,
-  notes,
-  terms: '',
-  checkIn: checkIn?.toISOString() || null,
-  checkOut: checkOut?.toISOString() || null,
-});
+    if (serverId) {
+      payload.id = serverId;
+      if (item.billId) {
+        payload.billId = item.billId;
+      }
+      if (item.createdAt) {
+        payload.createdAt = item.createdAt;
+      }
+      if (item.updatedAt) {
+        payload.updatedAt = item.updatedAt;
+      }
+    }
+
+    if (deleted) {
+      payload.mode = 'delete';
+    }
+
+    return payload;
+  };
+
+  const activeItems = lineItems
+    .filter(item => String(item.name || '').trim())
+    .map((item, index) => mapBillItem(item, index));
+
+  const removedItems = (deletedLineItems || [])
+    .filter(item => item?.serverId)
+    .map((item, index) =>
+      mapBillItem(item, item.sortOrder ?? index, {deleted: true}),
+    );
+
+  const payload = {
+    id: id || '',
+    from: String(from || '').trim(),
+    to: String(to || '').trim(),
+    payment_terms: String(paymentTerms || '').trim(),
+    billItems: [...activeItems, ...removedItems],
+    taxRate: Number(taxRate) || 0,
+    discount: {
+      rate: Number(discountRate) || 0,
+      price: Number(discountAmount) || 0,
+    },
+    subTotal: Number(subtotal) || 0,
+    gst: Number(taxAmount) || 0,
+    total: Number(total) || 0,
+    amountPaid: Number(amountPaid) || 0,
+    amountDue: Number(balanceDue) || 0,
+    notes: String(notes || ''),
+    checkIn: checkIn ? moment(checkIn).format('YYYY-MM-DD') : '',
+    checkOut: checkOut ? moment(checkOut).format('YYYY-MM-DD') : '',
+  };
+
+  if (!isUpdate) {
+    return payload;
+  }
+
+  return {
+    ...payload,
+    invoiceNo: metadata.invoiceNo,
+    hostId: metadata.hostId,
+    status: status || metadata.status || '',
+    createdAt: metadata.createdAt,
+    updatedAt: metadata.updatedAt,
+  };
+};
 
 const parseDiscountRate = (discount, subTotal) => {
+  if (discount?.rate != null && discount?.rate !== '') {
+    return String(discount.rate);
+  }
+
   const name = String(discount?.name || '').trim();
   const parsedName = Number(name.replace('%', ''));
 
@@ -197,9 +236,11 @@ export const formatBillDetails = response => {
     paymentTerms: bill.payment_terms || bill.paymentTerms || '',
     lineItems: billItems.map((item, index) => ({
       id: String(item.id || `bill-item-${index + 1}`),
-      billId: item.billId,
-      createdAt: item.createdAt,
-      updatedAt: item.updatedAt,
+      serverId: item.id || null,
+      billId: item.billId || '',
+      createdAt: item.createdAt || '',
+      updatedAt: item.updatedAt || '',
+      sortOrder: item.sortOrder ?? index,
       name: item.name || '',
       quantity:
         item.quantity === null || item.quantity === undefined
@@ -229,6 +270,67 @@ export const formatBillDetails = response => {
       createdAt: bill.createdAt,
       updatedAt: bill.updatedAt,
     },
+  };
+};
+
+const DEFAULT_BILL_LOGO_URL = 'https://www.boonies.in/Final-boonies-logo.png';
+
+const formatBillPreviewDate = value => {
+  if (!value) {
+    return '';
+  }
+
+  const date = moment(value);
+  return date.isValid() ? date.format('MMM D, YYYY') : '';
+};
+
+export const formatBillPreview = (response, {homestayLogo} = {}) => {
+  const bill = response?.data || response || {};
+  const billItems = Array.isArray(bill.billItems) ? bill.billItems : [];
+  const discount = bill.discount || {};
+  const discountPrice = Number(discount.price) || 0;
+  const discountRate =
+    discount.rate != null && discount.rate !== ''
+      ? Number(discount.rate) || 0
+      : Number(String(discount.name || '').replace('%', '')) || 0;
+  const from = String(bill.from || '').trim();
+  const invoiceNo = bill.invoiceNo || '';
+
+  return {
+    id: bill.id || '',
+    invoiceNo,
+    title: invoiceNo ? `Bill #${invoiceNo}` : 'Bill',
+    logoUrl: String(homestayLogo || '').trim() || DEFAULT_BILL_LOGO_URL,
+    businessName: from.split('\n')[0].trim(),
+    to: bill.to || bill.shippedTo || '',
+    createdAt: formatBillPreviewDate(bill.createdAt),
+    paymentTerms: bill.payment_terms || bill.paymentTerms || '',
+    dueDate: formatBillPreviewDate(bill.checkOut),
+    amountDue: Number(bill.amountDue) || 0,
+    items: billItems.map((item, index) => {
+      const quantity = Number(item.quantity) || 0;
+      const rate = Number(item.price) || 0;
+
+      return {
+        id: String(item.id || `bill-item-${index + 1}`),
+        name: item.name || '',
+        quantity,
+        rate,
+        amount: Number(item.total) || rate * quantity,
+      };
+    }),
+    subTotal: Number(bill.subTotal) || 0,
+    taxRate: Number(bill.taxRate) || 0,
+    gst: Number(bill.gst) || 0,
+    discount:
+      discountPrice > 0
+        ? {
+            rate: discountRate,
+            price: discountPrice,
+          }
+        : null,
+    total: Number(bill.total) || 0,
+    notes: bill.notes || '',
   };
 };
 

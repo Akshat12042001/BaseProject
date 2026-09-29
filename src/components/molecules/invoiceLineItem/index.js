@@ -20,26 +20,32 @@ const InvoiceLineItem = ({
   const total = (Number(item.quantity) || 0) * (Number(item.amount) || 0);
 
   const handleNameChange = useCallback(
-    value => onChange(item.id, 'name', value),
+    value => onChange(item.id, {name: value}),
     [item.id, onChange],
   );
 
   const handleQuantityChange = useCallback(
-    value => onChange(item.id, 'quantity', value.replace(/[^0-9]/g, '')),
+    value => onChange(item.id, {quantity: value.replace(/[^0-9]/g, '')}),
     [item.id, onChange],
   );
 
   const handleItemSelect = useCallback(
     selectedItem => {
-      onChange(item.id, 'name', selectedItem.title);
-      onChange(item.id, 'amount', String(selectedItem.amount));
-      onChange(item.id, 'quantity', '1');
+      onChange(item.id, {
+        name: selectedItem.title || '',
+        amount: String(
+          selectedItem.amount === null || selectedItem.amount === undefined
+            ? ''
+            : selectedItem.amount,
+        ),
+        quantity: item.quantity || '1',
+      });
     },
-    [item.id, onChange],
+    [item.id, item.quantity, onChange],
   );
 
   const handleAmountChange = useCallback(
-    value => onChange(item.id, 'amount', value.replace(/[^0-9.]/g, '')),
+    value => onChange(item.id, {amount: value.replace(/[^0-9.]/g, '')}),
     [item.id, onChange],
   );
 

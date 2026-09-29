@@ -1,7 +1,14 @@
 import React from 'react';
 import {createStackNavigator} from '@react-navigation/stack';
 import {NAVIGATION} from '../../constants';
-import { CreateInvoiceScreen, CreateMenuScreen, CreateLogoScreen, PropertyDetailScreen, CreateBookingScreen } from '../../screens/common';
+import {
+  CreateInvoiceScreen,
+  CreateMenuScreen,
+  CreateLogoScreen,
+  PropertyDetailScreen,
+  CreateBookingScreen,
+  BookingScreen,
+} from '../../screens/common';
 import config from '../config';
 
 const Stack = createStackNavigator();
@@ -28,6 +35,10 @@ export default () => {
       <Stack.Screen
         name={NAVIGATION.COMMON.CREATE_BOOKING_SCREEN}
         component={CreateBookingScreen}
+      />
+      <Stack.Screen
+        name={NAVIGATION.COMMON.BOOKING_SCREEN}
+        component={BookingScreen}
       />
     </Stack.Navigator>
   );

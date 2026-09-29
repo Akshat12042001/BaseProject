@@ -1,7 +1,7 @@
 import React from 'react';
 import {createStackNavigator} from '@react-navigation/stack';
 import {NAVIGATION} from '../../constants';
-import { LoginScreen, ForgotPasswordScreen} from '../../screens/authentication';
+import { LoginScreen, ForgotPasswordScreen, SignupScreen} from '../../screens/authentication';
 import config from '../config';
 
 const Stack = createStackNavigator();
@@ -16,6 +16,10 @@ export default () => {
       <Stack.Screen
         name={NAVIGATION.AUTH.FORGOT_PASSWORD_SCREEN}
         component={ForgotPasswordScreen}
+      />
+      <Stack.Screen
+        name={NAVIGATION.AUTH.SIGNUP_SCREEN}
+        component={SignupScreen}
       />
     </Stack.Navigator>
   );

@@ -20,9 +20,12 @@ const BookingCalendarModal = ({
   title = '',
   selectedDate = null,
   minimumDate = null,
+  allowAnyDate = false,
   unavailableDates = [],
   isLoading = false,
+  useClearAction = false,
   onConfirm,
+  onClear,
   onClose,
 }) => {
   const {t} = useTranslation();
@@ -35,11 +38,14 @@ const BookingCalendarModal = ({
   );
 
   const minDateString = useMemo(() => {
+    if (allowAnyDate) {
+      return undefined;
+    }
     if (minimumDate) {
       return toCalendarDateString(minimumDate);
     }
     return getTodayCalendarString();
-  }, [minimumDate]);
+  }, [allowAnyDate, minimumDate]);
 
   useEffect(() => {
     if (!isVisible) {
@@ -74,7 +80,7 @@ const BookingCalendarModal = ({
     [],
   );
 
-  const visibleMonth = pendingDate || minDateString;
+  const visibleMonth = pendingDate || minDateString || getTodayCalendarString();
 
   const markedDates = useMemo(
     () =>
@@ -107,6 +113,19 @@ const BookingCalendarModal = ({
 
     onConfirm?.(parseCalendarDateString(pendingDate));
   }, [onConfirm, pendingDate, unavailableDateSet]);
+
+  const handleSecondaryAction = useCallback(() => {
+    if (useClearAction) {
+      onClear?.();
+      return;
+    }
+
+    handleClose();
+  }, [handleClose, onClear, useClearAction]);
+
+  const secondaryActionLabel = useClearAction
+    ? t('BOOKING_LIST.CLEAR')
+    : t('CREATE_BOOKING.CANCEL_PICKER');
 
   return (
     <Modal
@@ -146,7 +165,7 @@ const BookingCalendarModal = ({
           <Calendar
             key={isVisible ? visibleMonth : 'hidden'}
             current={visibleMonth}
-            minDate={minDateString}
+            {...(minDateString ? {minDate: minDateString} : {})}
             markedDates={markedDates}
             onDayPress={handleDayPress}
             enableSwipeMonths
@@ -158,10 +177,11 @@ const BookingCalendarModal = ({
         <View style={styles.actionsRow}>
           <TouchableOpacity
             accessibilityRole="button"
-            onPress={handleClose}
+            accessibilityLabel={secondaryActionLabel}
+            onPress={handleSecondaryAction}
             style={styles.cancelButton}>
             <StyledText color={COLORS.LOGIN_PRIMARY} variant="semiBold" size={14}>
-              {t('CREATE_BOOKING.CANCEL_PICKER')}
+              {secondaryActionLabel}
             </StyledText>
           </TouchableOpacity>
           <TouchableOpacity
