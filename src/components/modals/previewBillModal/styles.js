@@ -38,9 +38,16 @@ export default StyleSheet.create({
     flex: 1,
   },
   scrollContent: {
-    paddingBottom: 32,
+    paddingBottom: 24,
     paddingHorizontal: 20,
     paddingTop: 20,
+  },
+  footer: {
+    backgroundColor: COLORS.WHITE,
+    borderTopColor: COLORS.GREYSCALE_200,
+    borderTopWidth: StyleSheet.hairlineWidth,
+    paddingHorizontal: 16,
+    paddingTop: 12,
   },
   brandRow: {
     alignItems: 'flex-start',

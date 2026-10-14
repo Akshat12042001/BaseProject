@@ -27,6 +27,10 @@ export default StyleSheet.create({
     flex: 1,
     marginRight: 12,
   },
+  headerActions: {
+    alignItems: 'center',
+    flexDirection: 'row',
+  },
   closeButton: {
     alignItems: 'center',
     height: 32,

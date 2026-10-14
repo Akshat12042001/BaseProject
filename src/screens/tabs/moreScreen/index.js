@@ -60,6 +60,11 @@ const MoreScreen = () => {
         });
         break;
       case 2:
+        navigation.navigate(NAVIGATION.STACKS.COMMON,{
+          screen: NAVIGATION.COMMON.SUPPORT_SCREEN,
+        });
+        break;
+      case 3:
         handleLogoutPress();
         break;
     }
@@ -89,13 +94,13 @@ const MoreScreen = () => {
               {item.icon}
               <View style={styles.logoutRowContent}>
                 <StyledText
-                  color={item.id === 1 ? COLORS.PRIMARY : COLORS.RED_ERROR}
+                  color={item.id !== 3 ? COLORS.PRIMARY : COLORS.RED_ERROR}
                   variant="semiBold"
                   size={14}>
                   {item.title}
                 </StyledText>
                 <ChevronRightIcon
-                  color={item.id === 1 ? COLORS.PRIMARY : COLORS.RED_ERROR}
+                  color={item.id !== 3 ? COLORS.PRIMARY : COLORS.RED_ERROR}
                 />
               </View>
             </TouchableOpacity>

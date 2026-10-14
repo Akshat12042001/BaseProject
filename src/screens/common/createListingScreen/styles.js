@@ -1,0 +1,766 @@
+import {StyleSheet} from 'react-native';
+import {COLORS, FONTS} from '../../../constants';
+
+export const STEP_WIDTH = 78;
+
+export default StyleSheet.create({
+  screen: {
+    flex: 1,
+    backgroundColor: COLORS.GREYSCALE_100,
+  },
+  listingStatus: {
+    alignItems: 'center',
+    flex: 1,
+    justifyContent: 'center',
+    paddingHorizontal: 24,
+  },
+  listingRetry: {
+    marginTop: 16,
+  },
+  header: {
+    paddingBottom: 12,
+  },
+  subtitle: {
+    marginTop: 6,
+  },
+  stepperCard: {
+    marginTop: 16,
+    backgroundColor: COLORS.WHITE,
+    borderRadius: 14,
+    paddingHorizontal: 12,
+    paddingTop: 14,
+    paddingBottom: 12,
+  },
+  stepperTrack: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+  },
+  stepPressable: {
+    alignItems: 'center',
+    width: STEP_WIDTH,
+  },
+  stepCircleWrap: {
+    width: '100%',
+    height: 28,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  stepConnector: {
+    position: 'absolute',
+    top: 13,
+    height: 1,
+    backgroundColor: COLORS.GREYSCALE_200,
+  },
+  stepConnectorLeft: {
+    left: 0,
+    right: '50%',
+    marginRight: 18,
+  },
+  stepConnectorRight: {
+    left: '50%',
+    right: 0,
+    marginLeft: 18,
+  },
+  stepCircle: {
+    width: 28,
+    height: 28,
+    borderRadius: 14,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: COLORS.GREYSCALE_200,
+    zIndex: 1,
+  },
+  stepCircleActive: {
+    backgroundColor: COLORS.LOGIN_PRIMARY,
+  },
+  stepLabel: {
+    marginTop: 6,
+    alignSelf: 'stretch',
+  },
+  stepPage: {
+    flex: 1,
+  },
+  stepPageHidden: {
+    display: 'none',
+  },
+  scrollContent: {
+    paddingHorizontal: 16,
+    paddingBottom: 24,
+  },
+  card: {
+    backgroundColor: COLORS.WHITE,
+    borderRadius: 16,
+    borderWidth: 1,
+    borderColor: COLORS.BORDER_LIGHT,
+    paddingHorizontal: 16,
+    paddingTop: 20,
+    paddingBottom: 16,
+  },
+  descriptionField: {
+    marginBottom: 4,
+  },
+  descriptionInput: {
+    height: 120,
+    paddingTop: 16,
+    textAlignVertical: 'top',
+  },
+  descriptionCount: {
+    marginBottom: 12,
+    marginLeft: 4,
+  },
+  houseRulesInput: {
+    height: 96,
+    paddingTop: 16,
+    textAlignVertical: 'top',
+  },
+  fieldRow: {
+    flexDirection: 'row',
+    gap: 12,
+  },
+  halfField: {
+    flex: 1,
+  },
+  mapButton: {
+    alignSelf: 'flex-start',
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    borderWidth: 1,
+    borderColor: COLORS.LOGIN_PRIMARY,
+    borderRadius: 10,
+    paddingHorizontal: 14,
+    paddingVertical: 10,
+    marginBottom: 16,
+  },
+  mapCoordinates: {
+    marginBottom: 16,
+    marginLeft: 2,
+    marginTop: -10,
+  },
+  cancellationHint: {
+    marginTop: 8,
+    marginBottom: 8,
+    marginLeft: 4,
+  },
+  footerDivider: {
+    height: 1,
+    backgroundColor: COLORS.GREYSCALE_200,
+    marginTop: 8,
+    marginBottom: 16,
+  },
+  footer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  previousButton: {
+    minWidth: 108,
+    borderWidth: 1,
+    borderColor: COLORS.GREYSCALE_200,
+    borderRadius: 10,
+    paddingVertical: 12,
+    paddingHorizontal: 22,
+    alignItems: 'center',
+    backgroundColor: COLORS.WHITE,
+  },
+  previousButtonDisabled: {
+    opacity: 0.45,
+  },
+  nextButton: {
+    minWidth: 92,
+    borderRadius: 10,
+    paddingVertical: 12,
+    paddingHorizontal: 28,
+    alignItems: 'center',
+    backgroundColor: COLORS.LOGIN_PRIMARY,
+  },
+  nextButtonDisabled: {
+    opacity: 0.45,
+  },
+  dropdown: {
+    marginBottom: 15,
+    position: 'relative',
+    zIndex: 10,
+  },
+  locationField: {
+    position: 'relative',
+  },
+  locationBlocker: {
+    bottom: 0,
+    left: 0,
+    position: 'absolute',
+    right: 0,
+    top: 0,
+    zIndex: 50,
+  },
+  cityDropdown: {
+    zIndex: 30,
+  },
+  stateDropdown: {
+    zIndex: 40,
+  },
+  propertyTypeDropdown: {
+    zIndex: 20,
+  },
+  rentalSection: {
+    marginBottom: 16,
+    marginTop: 4,
+  },
+  rentalSectionTitle: {
+    marginBottom: 6,
+  },
+  rentalSectionSubtitle: {
+    lineHeight: 20,
+    marginBottom: 14,
+  },
+  entireCard: {
+    backgroundColor: COLORS.WHITE,
+    borderColor: COLORS.LOGIN_PRIMARY,
+    borderRadius: 14,
+    borderWidth: 1.5,
+    marginBottom: 14,
+    paddingHorizontal: 14,
+    paddingVertical: 14,
+  },
+  entireCardLabel: {
+    marginBottom: 12,
+  },
+  rentalInfoBanner: {
+    alignItems: 'flex-start',
+    backgroundColor: '#EAF4FB',
+    borderRadius: 10,
+    flexDirection: 'row',
+    marginBottom: 14,
+    paddingHorizontal: 12,
+    paddingVertical: 12,
+  },
+  rentalInfoIcon: {
+    alignItems: 'center',
+    backgroundColor: '#5B9BD5',
+    borderRadius: 10,
+    height: 18,
+    justifyContent: 'center',
+    marginRight: 8,
+    marginTop: 1,
+    width: 18,
+  },
+  rentalInfoIconText: {
+    color: COLORS.WHITE,
+    fontSize: 11,
+    fontWeight: '700',
+    lineHeight: 12,
+  },
+  rentalInfoText: {
+    flex: 1,
+    lineHeight: 18,
+  },
+  rentalFieldHint: {
+    lineHeight: 16,
+    marginBottom: 12,
+    marginLeft: 2,
+    marginTop: -6,
+  },
+  rentalCharCount: {
+    marginBottom: 4,
+    marginLeft: 4,
+    marginTop: 6,
+  },
+  optionCard: {
+    backgroundColor: COLORS.WHITE,
+    borderColor: '#E6E6E6',
+    borderRadius: 14,
+    borderWidth: 1,
+    marginBottom: 14,
+    paddingHorizontal: 14,
+    paddingVertical: 14,
+  },
+  optionHeader: {
+    alignItems: 'center',
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: 10,
+  },
+  optionHeaderTitle: {
+    flex: 1,
+    marginRight: 12,
+  },
+  optionDivider: {
+    backgroundColor: '#E6E6E6',
+    height: StyleSheet.hairlineWidth,
+    marginBottom: 14,
+  },
+  optionSwitchRow: {
+    alignItems: 'center',
+    flexDirection: 'row',
+    marginBottom: 12,
+    marginRight: 22,
+  },
+  optionSwitchLabel: {
+    marginLeft: 10,
+  },
+  optionSwitches: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    marginTop: 4,
+  },
+  addOptionButton: {
+    alignItems: 'center',
+    alignSelf: 'flex-start',
+    backgroundColor: COLORS.LOGIN_PRIMARY,
+    borderRadius: 8,
+    flexDirection: 'row',
+    marginBottom: 8,
+    paddingHorizontal: 14,
+    paddingVertical: 12,
+  },
+  cancellationDropdown: {
+    zIndex: 10,
+    marginBottom: 4,
+  },
+  dropdownLabel: {
+    backgroundColor: COLORS.WHITE,
+    left: 10,
+    paddingHorizontal: 4,
+    position: 'absolute',
+    top: 0,
+    zIndex: 2,
+  },
+  requiredMark: {
+    color: COLORS.RED_ERROR,
+    fontFamily: FONTS.regular,
+    fontSize: 12,
+  },
+  dropdownField: {
+    height: 54,
+    marginTop: 8,
+    borderWidth: 1,
+    borderRadius: 6,
+    borderColor: COLORS.LOGIN_INPUT_BORDER,
+    backgroundColor: COLORS.WHITE,
+    paddingHorizontal: 12,
+  },
+  dropdownFieldFocused: {
+    borderColor: COLORS.LOGIN_PRIMARY,
+  },
+  dropdownFieldError: {
+    borderColor: COLORS.RED_ERROR,
+  },
+  dropdownPlaceholder: {
+    color: COLORS.GREYSCALE_500,
+    fontFamily: FONTS.regular,
+    fontSize: 14,
+  },
+  dropdownSelectedText: {
+    color: COLORS.GREYSCALE_900,
+    fontFamily: FONTS.regular,
+    fontSize: 14,
+  },
+  dropdownItemText: {
+    color: COLORS.GREYSCALE_900,
+    fontFamily: FONTS.regular,
+    fontSize: 14,
+  },
+  dropdownList: {
+    borderRadius: 7,
+    borderWidth: 1,
+    borderColor: COLORS.BORDER_LIGHT,
+    backgroundColor: COLORS.WHITE,
+  },
+  dropdownError: {
+    marginLeft: 4,
+    marginTop: 4,
+  },
+  sectionTitle: {
+    marginBottom: 20,
+  },
+  questionBlock: {
+    marginBottom: 22,
+  },
+  questionLabel: {
+    marginBottom: 8,
+  },
+  measureRow: {
+    alignItems: 'center',
+    flexDirection: 'row',
+    gap: 10,
+  },
+  measureInput: {
+    backgroundColor: COLORS.WHITE,
+    borderColor: COLORS.LOGIN_INPUT_BORDER,
+    borderRadius: 8,
+    borderWidth: 1,
+    color: COLORS.GREYSCALE_900,
+    flex: 1,
+    fontFamily: FONTS.regular,
+    fontSize: 15,
+    height: 48,
+    paddingHorizontal: 14,
+  },
+  measureInputFocused: {
+    borderColor: COLORS.LOGIN_PRIMARY,
+  },
+  measureInputError: {
+    borderColor: COLORS.RED_ERROR,
+  },
+  unitField: {
+    backgroundColor: COLORS.WHITE,
+    borderColor: COLORS.LOGIN_INPUT_BORDER,
+    borderRadius: 8,
+    borderWidth: 1,
+    height: 48,
+    paddingHorizontal: 10,
+    width: 104,
+  },
+  unitSelectedText: {
+    color: COLORS.GREYSCALE_900,
+    fontFamily: FONTS.regular,
+    fontSize: 13,
+  },
+  switchRow: {
+    alignItems: 'center',
+    flexDirection: 'row',
+  },
+  switchCaption: {
+    marginLeft: 10,
+  },
+  suitableField: {
+    backgroundColor: COLORS.WHITE,
+    borderColor: COLORS.LOGIN_INPUT_BORDER,
+    borderRadius: 8,
+    borderWidth: 1,
+    minHeight: 48,
+    paddingHorizontal: 12,
+  },
+  suitableFieldError: {
+    borderColor: COLORS.RED_ERROR,
+  },
+  suitableSearch: {
+    borderWidth: 0,
+    color: COLORS.GREYSCALE_900,
+    fontFamily: FONTS.regular,
+    fontSize: 15,
+    height: 40,
+    margin: 0,
+    marginBottom: 0,
+    paddingHorizontal: 0,
+  },
+  suitableList: {
+    backgroundColor: COLORS.WHITE,
+    borderColor: COLORS.GREYSCALE_200,
+    borderRadius: 0,
+    borderWidth: 0,
+    borderTopWidth: StyleSheet.hairlineWidth,
+    elevation: 0,
+    shadowOpacity: 0,
+  },
+  fieldHint: {
+    marginTop: 6,
+  },
+  availabilityHeading: {
+    marginBottom: 12,
+    marginTop: 4,
+  },
+  availabilityCard: {
+    borderColor: COLORS.GREYSCALE_200,
+    borderRadius: 12,
+    borderWidth: 1,
+    marginBottom: 14,
+    paddingHorizontal: 14,
+    paddingVertical: 14,
+  },
+  availabilitySwitch: {
+    alignItems: 'flex-start',
+    flexDirection: 'row',
+  },
+  availabilityCopy: {
+    flex: 1,
+    marginLeft: 12,
+  },
+  availabilityHint: {
+    marginTop: 4,
+  },
+  offSeasonLink: {
+    alignItems: 'center',
+    flexDirection: 'row',
+    marginTop: 10,
+  },
+  offSeasonLinkText: {
+    flexShrink: 1,
+    marginRight: 6,
+  },
+  offSeasonFields: {
+    marginTop: 16,
+  },
+  offSeasonHint: {
+    marginBottom: 14,
+    marginTop: 6,
+  },
+  offSeasonLastField: {
+    marginBottom: 0,
+  },
+  amenitiesHeader: {
+    alignItems: 'center',
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: 18,
+  },
+  amenitiesTitle: {
+    flex: 1,
+    marginRight: 12,
+  },
+  amenitiesBadge: {
+    backgroundColor: COLORS.LOGIN_PRIMARY,
+    borderRadius: 16,
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+  },
+  amenityGroup: {
+    marginBottom: 8,
+  },
+  amenitiesStatus: {
+    alignItems: 'center',
+    marginBottom: 16,
+    marginTop: 8,
+  },
+  addOnSection: {
+    borderColor: '#E6E6E6',
+    borderRadius: 12,
+    borderWidth: 1,
+    marginBottom: 14,
+    paddingHorizontal: 14,
+    paddingVertical: 16,
+  },
+  addOnCopyInline: {
+    flex: 0,
+    flexGrow: 0,
+  },
+  addOnRow: {
+    alignItems: 'flex-start',
+    flexDirection: 'row',
+  },
+  addOnCheck: {
+    alignItems: 'center',
+    backgroundColor: COLORS.WHITE,
+    borderColor: '#C8C8C8',
+    borderRadius: 3,
+    borderWidth: 1.5,
+    height: 18,
+    justifyContent: 'center',
+    marginTop: 2,
+    width: 18,
+  },
+  addOnCheckSelected: {
+    borderColor: COLORS.LOGIN_PRIMARY,
+  },
+  addOnCopy: {
+    flex: 1,
+    marginLeft: 12,
+  },
+  addOnHint: {
+    marginTop: 4,
+  },
+  addOnNested: {
+    marginLeft: 32,
+    marginTop: 16,
+  },
+  addOnNestedRow: {
+    flexDirection: 'row',
+    marginBottom: 16,
+  },
+  addOnNestedItem: {
+    marginRight: 28,
+  },
+  addOnPlain: {
+    marginBottom: 8,
+    marginTop: 2,
+    paddingHorizontal: 4,
+  },
+  addOnDivider: {
+    backgroundColor: '#E6E6E6',
+    height: 1,
+    marginBottom: 18,
+    marginTop: 10,
+  },
+  addOnFooter: {
+    alignItems: 'center',
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+  },
+  addOnPrevious: {
+    alignItems: 'center',
+    backgroundColor: COLORS.WHITE,
+    borderColor: COLORS.LOGIN_PRIMARY,
+    borderRadius: 8,
+    borderWidth: 1,
+    minWidth: 108,
+    paddingHorizontal: 22,
+    paddingVertical: 10,
+  },
+  photoDrop: {
+    alignItems: 'center',
+    backgroundColor: '#FAFAFA',
+    borderColor: '#D5D5D5',
+    borderRadius: 12,
+    borderStyle: 'dashed',
+    borderWidth: 1.5,
+    paddingHorizontal: 24,
+    paddingVertical: 28,
+  },
+  photoIcon: {
+    marginBottom: 14,
+  },
+  photoTitle: {
+    marginBottom: 8,
+  },
+  photoHint: {
+    marginBottom: 18,
+  },
+  photoChoose: {
+    alignItems: 'center',
+    backgroundColor: COLORS.LOGIN_PRIMARY,
+    borderRadius: 8,
+    paddingHorizontal: 22,
+    paddingVertical: 12,
+  },
+  photoSection: {
+    marginTop: 22,
+  },
+  photoSectionTitle: {
+    alignItems: 'center',
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    marginBottom: 14,
+  },
+  photoLimits: {
+    marginLeft: 6,
+  },
+  photoExistingLabel: {
+    marginBottom: 12,
+  },
+  photoCard: {
+    alignItems: 'center',
+    backgroundColor: COLORS.WHITE,
+    borderColor: '#E6E6E6',
+    borderRadius: 16,
+    borderWidth: 1,
+    flexDirection: 'row',
+    marginBottom: 12,
+    paddingHorizontal: 12,
+    paddingVertical: 12,
+  },
+  photoCardDragging: {
+    shadowColor: '#000000',
+    shadowOffset: {width: 0, height: 6},
+    shadowOpacity: 0.12,
+    shadowRadius: 10,
+  },
+  photoThumbWrap: {
+    borderRadius: 12,
+    height: 72,
+    marginRight: 12,
+    overflow: 'hidden',
+    width: 72,
+  },
+  photoThumb: {
+    height: 72,
+    width: 72,
+  },
+  photoOrderBadge: {
+    alignItems: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.72)',
+    borderRadius: 11,
+    bottom: 6,
+    height: 22,
+    justifyContent: 'center',
+    left: 6,
+    minWidth: 22,
+    paddingHorizontal: 4,
+    position: 'absolute',
+  },
+  photoFeaturedBadge: {
+    backgroundColor: '#F5C242',
+    borderRadius: 6,
+    left: 6,
+    paddingHorizontal: 6,
+    paddingVertical: 2,
+    position: 'absolute',
+    top: 6,
+  },
+  photoBody: {
+    flex: 1,
+    marginRight: 8,
+    minWidth: 0,
+  },
+  photoName: {
+    marginBottom: 2,
+  },
+  photoActions: {
+    alignItems: 'center',
+    flexDirection: 'row',
+  },
+  photoActionButton: {
+    alignItems: 'center',
+    height: 32,
+    justifyContent: 'center',
+    marginLeft: 6,
+    width: 28,
+  },
+  photoGrip: {
+    height: 18,
+    justifyContent: 'space-between',
+    width: 12,
+  },
+  photoGripRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+  },
+  photoGripDot: {
+    backgroundColor: '#C5C5C5',
+    borderRadius: 1.5,
+    height: 3,
+    width: 3,
+  },
+  photoDelete: {
+    alignItems: 'center',
+    backgroundColor: '#EF4444',
+    borderRadius: 18,
+    height: 36,
+    justifyContent: 'center',
+    marginLeft: 8,
+    width: 36,
+  },
+  buttonSaving: {
+    opacity: 0.7,
+  },
+  addOnNext: {
+    alignItems: 'center',
+    backgroundColor: COLORS.LOGIN_PRIMARY,
+    borderRadius: 8,
+    minWidth: 92,
+    paddingHorizontal: 26,
+    paddingVertical: 10,
+  },
+  amenityGroupLabel: {
+    letterSpacing: 0.8,
+    marginBottom: 10,
+    textTransform: 'uppercase',
+  },
+  linkText: {
+    color: COLORS.LOGIN_PRIMARY,
+    fontFamily: FONTS.medium,
+  },
+  priceField: {
+    marginBottom: 16,
+  },
+  priceHintField: {
+    marginBottom: 0,
+  },
+  pricingDropdown: {
+    backgroundColor: COLORS.WHITE,
+    borderColor: COLORS.LOGIN_INPUT_BORDER,
+    borderRadius: 8,
+    borderWidth: 1,
+    height: 48,
+    paddingHorizontal: 12,
+  },
+});

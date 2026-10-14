@@ -25,8 +25,21 @@ export default StyleSheet.create({
     flex: 1,
   },
   taxInput: {
-    flex: 0.75,
     marginBottom: 15,
+    width: 64,
+  },
+  taxRateField: {
+    fontSize: 13,
+    height: 40,
+    lineHeight: 16,
+    paddingHorizontal: 6,
+    paddingRight: 28,
+    paddingVertical: 0,
+    textAlign: 'center',
+  },
+  taxRateIcon: {
+    right: 8,
+    top: 10,
   },
   taxAmount: {
     alignItems: 'flex-end',

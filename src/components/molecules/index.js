@@ -12,3 +12,5 @@ export {default as PropertyReviewsSection} from './propertyReviewsSection';
 export {default as PropertyInquiryCard} from './propertyInquiryCard';
 export {default as BookingCard} from './bookingCard';
 export {default as BookingFiltersSection} from './bookingFiltersSection';
+export {default as NotificationCard} from './notificationCard';
+export {default as AmenityCard} from './amenityCard';

@@ -1,7 +1,7 @@
 import React, {useCallback, useEffect, useMemo, useState} from 'react';
 import {ActivityIndicator, FlatList, RefreshControl, TouchableOpacity, View} from 'react-native';
 import moment from 'moment';
-import {useNavigation} from '@react-navigation/native';
+import {useFocusEffect, useNavigation} from '@react-navigation/native';
 import {useTranslation} from 'react-i18next';
 import Skeleton from 'react-native-reanimated-skeleton';
 import {
@@ -113,6 +113,10 @@ const BookingScreen = () => {
   const hasNextPage =
     (bookingsResponse?.meta?.page || page) <
     (bookingsResponse?.meta?.totalPages || 1);
+
+    useFocusEffect(useCallback(() => {
+      refetch();
+    }, [refetch]));
 
   useEffect(() => {
     setPage(1);
@@ -236,7 +240,10 @@ const BookingScreen = () => {
 
         await shareDealSummary(
           data,
-          getDealSummaryShareTitle(data.propertyName || fallbackTitle),
+          getDealSummaryShareTitle(
+            data.guest?.name,
+            data.propertyName || fallbackTitle,
+          ),
         );
       } catch (error) {
         // APIClient already toasts API failures.
@@ -307,6 +314,14 @@ const BookingScreen = () => {
     [bookings, handleOpenPreviewBooking, handleShareBooking, navigation],
   );
 
+  const handleBookingCardPress = useCallback(
+    bookingId => {
+      const booking = bookings.find(item => item.id === bookingId);
+      handleOpenPreviewBooking(bookingId, booking?.homestayTitle || '');
+    },
+    [bookings, handleOpenPreviewBooking],
+  );
+
   const renderBooking = useCallback(
     ({item}) => (
       <BookingCard
@@ -319,9 +334,10 @@ const BookingScreen = () => {
         offeredPrice={item.offeredPrice}
         adults={item.adults}
         onMenuAction={handleBookingMenuAction}
+        onPress={handleBookingCardPress}
       />
     ),
-    [handleBookingMenuAction],
+    [handleBookingCardPress, handleBookingMenuAction],
   );
 
   const handleLoadMore = useCallback(() => {

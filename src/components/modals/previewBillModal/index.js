@@ -1,4 +1,4 @@
-import React, {useCallback, useMemo} from 'react';
+import React, {useCallback, useMemo, useState} from 'react';
 import {
   ActivityIndicator,
   Image,
@@ -9,10 +9,12 @@ import {
 import Modal from 'react-native-modal';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import {useTranslation} from 'react-i18next';
-import {StyledText} from '../../atoms';
+import {CustomButton, StyledText} from '../../atoms';
 import {CloseIcon} from '../../svgs';
 import {COLORS} from '../../../constants';
+import {errorToast} from '../../../utils/alerts';
 import {formatCurrencyWithDecimals} from '../../../utils/invoice';
+import {shareInvoice} from '../../../utils/shareInvoice';
 import styles from './styles';
 
 const EMPTY_VALUE = '—';
@@ -62,14 +64,34 @@ const PreviewBillModal = ({
   isVisible = false,
   isLoading = false,
   data = null,
+  invoice = null,
   onClose,
 }) => {
   const {t} = useTranslation();
   const insets = useSafeAreaInsets();
+  const [isSharing, setIsSharing] = useState(false);
 
   const handleClose = useCallback(() => {
     onClose?.();
   }, [onClose]);
+
+  const handleShare = useCallback(async () => {
+    if (!invoice || isSharing || isLoading) {
+      return;
+    }
+
+    try {
+      setIsSharing(true);
+      await shareInvoice(invoice, t('CREATE_INVOICE.SHARE_TITLE'));
+    } catch (error) {
+      const message = String(error?.message || '').toLowerCase();
+      if (!message.includes('cancel') && !message.includes('did not share')) {
+        errorToast(t('INVOICES.SHARE_FAILED'));
+      }
+    } finally {
+      setIsSharing(false);
+    }
+  }, [invoice, isLoading, isSharing, t]);
 
   const preview = useMemo(
     () => ({
@@ -110,7 +132,6 @@ const PreviewBillModal = ({
           styles.container,
           {
             paddingTop: insets.top || 12,
-            paddingBottom: insets.bottom || 12,
           },
         ]}>
         <View style={styles.header}>
@@ -127,7 +148,7 @@ const PreviewBillModal = ({
             hitSlop={{top: 8, bottom: 8, left: 8, right: 8}}
             onPress={handleClose}
             style={styles.closeButton}>
-            <CloseIcon color={COLORS.GREYSCALE_900} size={14} />
+            <CloseIcon color={COLORS.GREYSCALE_900} size={22} />
           </TouchableOpacity>
         </View>
 
@@ -136,201 +157,217 @@ const PreviewBillModal = ({
             <ActivityIndicator color={COLORS.LOGIN_PRIMARY} size="large" />
           </View>
         ) : (
-          <ScrollView
-            style={styles.scrollView}
-            contentContainerStyle={styles.scrollContent}
-            showsVerticalScrollIndicator={false}>
-            <View style={styles.brandRow}>
-              <View style={styles.brandBlock}>
-                {!!preview.logoUrl && (
-                  <Image
-                    source={{uri: preview.logoUrl}}
-                    style={styles.logo}
-                    resizeMode="contain"
-                  />
-                )}
-                {!!preview.businessName && (
-                  <StyledText
-                    size={13}
-                    variant="medium"
-                    containerStyle={styles.businessName}>
-                    {preview.businessName}
-                  </StyledText>
-                )}
-              </View>
-              <View style={styles.invoiceHeading}>
-                <StyledText
-                  variant="bold"
-                  size={22}
-                  containerStyle={styles.invoiceLabel}>
-                  {t('INVOICES.PREVIEW_INVOICE')}
-                </StyledText>
-                <StyledText
-                  color={COLORS.TEXT_SECONDARY}
-                  size={13}
-                  containerStyle={styles.invoiceNumber}>
-                  # {displayValue(preview.invoiceNo)}
-                </StyledText>
-              </View>
-            </View>
-
-            <View style={styles.metaSection}>
-              <View style={styles.billToBlock}>
-                <StyledText
-                  color={COLORS.TEXT_MUTED}
-                  size={10}
-                  variant="semiBold"
-                  containerStyle={styles.sectionLabel}>
-                  {t('INVOICES.PREVIEW_BILL_TO')}
-                </StyledText>
-                <StyledText variant="bold" size={15}>
-                  {displayValue(preview.to)}
-                </StyledText>
-              </View>
-
-              <View style={styles.metaRight}>
-                <MetaRow
-                  label={t('INVOICES.PREVIEW_DATE')}
-                  value={preview.createdAt}
-                />
-                <MetaRow
-                  label={t('INVOICES.PREVIEW_PAYMENT_TERMS')}
-                  value={preview.paymentTerms}
-                />
-                <MetaRow
-                  label={t('INVOICES.PREVIEW_DUE_DATE')}
-                  value={preview.dueDate}
-                />
-                <View style={styles.balanceBlock}>
-                  <StyledText color={COLORS.TEXT_MUTED} size={12}>
-                    {t('INVOICES.PREVIEW_BALANCE_DUE')}
-                  </StyledText>
+          <>
+            <ScrollView
+              style={styles.scrollView}
+              contentContainerStyle={styles.scrollContent}
+              showsVerticalScrollIndicator={false}>
+              <View style={styles.brandRow}>
+                <View style={styles.brandBlock}>
+                  {!!preview.logoUrl && (
+                    <Image
+                      source={{uri: preview.logoUrl}}
+                      style={styles.logo}
+                      resizeMode="contain"
+                    />
+                  )}
+                  {!!preview.businessName && (
+                    <StyledText
+                      size={13}
+                      variant="medium"
+                      containerStyle={styles.businessName}>
+                      {preview.businessName}
+                    </StyledText>
+                  )}
+                </View>
+                <View style={styles.invoiceHeading}>
                   <StyledText
                     variant="bold"
-                    size={18}
-                    containerStyle={styles.balanceAmount}>
-                    {formatCurrencyWithDecimals(preview.amountDue)}
+                    size={22}
+                    containerStyle={styles.invoiceLabel}>
+                    {t('INVOICES.PREVIEW_INVOICE')}
+                  </StyledText>
+                  <StyledText
+                    color={COLORS.TEXT_SECONDARY}
+                    size={13}
+                    containerStyle={styles.invoiceNumber}>
+                    # {displayValue(preview.invoiceNo)}
                   </StyledText>
                 </View>
               </View>
-            </View>
 
-            <View style={styles.tableHeader}>
-              <View style={styles.colItem}>
-                <StyledText
-                  color={COLORS.TEXT_MUTED}
-                  size={10}
-                  variant="semiBold"
-                  containerStyle={styles.tableHeaderText}>
-                  {t('INVOICES.PREVIEW_ITEM')}
-                </StyledText>
-              </View>
-              <View style={styles.colQty}>
-                <StyledText
-                  color={COLORS.TEXT_MUTED}
-                  size={10}
-                  variant="semiBold"
-                  containerStyle={styles.tableHeaderText}>
-                  {t('INVOICES.PREVIEW_QUANTITY')}
-                </StyledText>
-              </View>
-              <View style={styles.colRate}>
-                <StyledText
-                  color={COLORS.TEXT_MUTED}
-                  size={10}
-                  variant="semiBold"
-                  containerStyle={styles.tableHeaderText}>
-                  {t('INVOICES.PREVIEW_RATE')}
-                </StyledText>
-              </View>
-              <View style={styles.colAmount}>
-                <StyledText
-                  color={COLORS.TEXT_MUTED}
-                  size={10}
-                  variant="semiBold"
-                  containerStyle={styles.tableHeaderText}>
-                  {t('INVOICES.PREVIEW_AMOUNT')}
-                </StyledText>
-              </View>
-            </View>
+              <View style={styles.metaSection}>
+                <View style={styles.billToBlock}>
+                  <StyledText
+                    color={COLORS.TEXT_MUTED}
+                    size={10}
+                    variant="semiBold"
+                    containerStyle={styles.sectionLabel}>
+                    {t('INVOICES.PREVIEW_BILL_TO')}
+                  </StyledText>
+                  <StyledText variant="bold" size={15}>
+                    {displayValue(preview.to)}
+                  </StyledText>
+                </View>
 
-            {preview.items.map(item => (
-              <View key={item.id} style={styles.tableRow}>
+                <View style={styles.metaRight}>
+                  <MetaRow
+                    label={t('INVOICES.PREVIEW_DATE')}
+                    value={preview.createdAt}
+                  />
+                  <MetaRow
+                    label={t('INVOICES.PREVIEW_PAYMENT_TERMS')}
+                    value={preview.paymentTerms}
+                  />
+                  <MetaRow
+                    label={t('INVOICES.PREVIEW_DUE_DATE')}
+                    value={preview.dueDate}
+                  />
+                  <View style={styles.balanceBlock}>
+                    <StyledText color={COLORS.TEXT_MUTED} size={12}>
+                      {t('INVOICES.PREVIEW_BALANCE_DUE')}
+                    </StyledText>
+                    <StyledText
+                      variant="bold"
+                      size={18}
+                      containerStyle={styles.balanceAmount}>
+                      {formatCurrencyWithDecimals(preview.amountDue)}
+                    </StyledText>
+                  </View>
+                </View>
+              </View>
+
+              <View style={styles.tableHeader}>
                 <View style={styles.colItem}>
-                  <StyledText size={13} numberOfLines={3}>
-                    {displayValue(item.name)}
+                  <StyledText
+                    color={COLORS.TEXT_MUTED}
+                    size={10}
+                    variant="semiBold"
+                    containerStyle={styles.tableHeaderText}>
+                    {t('INVOICES.PREVIEW_ITEM')}
                   </StyledText>
                 </View>
                 <View style={styles.colQty}>
-                  <StyledText size={13}>{item.quantity}</StyledText>
+                  <StyledText
+                    color={COLORS.TEXT_MUTED}
+                    size={10}
+                    variant="semiBold"
+                    containerStyle={styles.tableHeaderText}>
+                    {t('INVOICES.PREVIEW_QUANTITY')}
+                  </StyledText>
                 </View>
                 <View style={styles.colRate}>
-                  <StyledText size={13}>
-                    {formatCurrencyWithDecimals(item.rate)}
+                  <StyledText
+                    color={COLORS.TEXT_MUTED}
+                    size={10}
+                    variant="semiBold"
+                    containerStyle={styles.tableHeaderText}>
+                    {t('INVOICES.PREVIEW_RATE')}
                   </StyledText>
                 </View>
                 <View style={styles.colAmount}>
-                  <StyledText size={13} variant="bold">
-                    {formatCurrencyWithDecimals(item.amount)}
+                  <StyledText
+                    color={COLORS.TEXT_MUTED}
+                    size={10}
+                    variant="semiBold"
+                    containerStyle={styles.tableHeaderText}>
+                    {t('INVOICES.PREVIEW_AMOUNT')}
                   </StyledText>
                 </View>
               </View>
-            ))}
 
-            <View style={styles.summary}>
-              <SummaryRow
-                label={t('INVOICES.PREVIEW_SUBTOTAL')}
-                value={formatCurrencyWithDecimals(preview.subTotal)}
-              />
-              <SummaryRow
-                label={t('INVOICES.PREVIEW_TAX', {rate: preview.taxRate})}
-                value={formatCurrencyWithDecimals(preview.gst)}
-              />
-              {!!preview.discount && (
+              {preview.items.map(item => (
+                <View key={item.id} style={styles.tableRow}>
+                  <View style={styles.colItem}>
+                    <StyledText size={13} numberOfLines={3}>
+                      {displayValue(item.name)}
+                    </StyledText>
+                  </View>
+                  <View style={styles.colQty}>
+                    <StyledText size={13}>{item.quantity}</StyledText>
+                  </View>
+                  <View style={styles.colRate}>
+                    <StyledText size={13}>
+                      {formatCurrencyWithDecimals(item.rate)}
+                    </StyledText>
+                  </View>
+                  <View style={styles.colAmount}>
+                    <StyledText size={13} variant="bold">
+                      {formatCurrencyWithDecimals(item.amount)}
+                    </StyledText>
+                  </View>
+                </View>
+              ))}
+
+              <View style={styles.summary}>
                 <SummaryRow
-                  label={t('INVOICES.PREVIEW_DISCOUNT', {
-                    rate: preview.discount.rate,
-                  })}
-                  value={formatCurrencyWithDecimals(preview.discount.price)}
+                  label={t('INVOICES.PREVIEW_SUBTOTAL')}
+                  value={formatCurrencyWithDecimals(preview.subTotal)}
                 />
-              )}
-              <View style={styles.summaryDivider} />
-              <SummaryRow
-                label={t('INVOICES.PREVIEW_TOTAL')}
-                value={formatCurrencyWithDecimals(preview.total)}
-                emphasize
-              />
-              <SummaryRow
-                label={t('INVOICES.PREVIEW_BALANCE_DUE')}
-                value={formatCurrencyWithDecimals(preview.amountDue)}
-                emphasize
-              />
-            </View>
+                <SummaryRow
+                  label={t('INVOICES.PREVIEW_TAX', {rate: preview.taxRate})}
+                  value={formatCurrencyWithDecimals(preview.gst)}
+                />
+                {!!preview.discount && (
+                  <SummaryRow
+                    label={t('INVOICES.PREVIEW_DISCOUNT', {
+                      rate: preview.discount.rate,
+                    })}
+                    value={formatCurrencyWithDecimals(preview.discount.price)}
+                  />
+                )}
+                <View style={styles.summaryDivider} />
+                <SummaryRow
+                  label={t('INVOICES.PREVIEW_TOTAL')}
+                  value={formatCurrencyWithDecimals(preview.total)}
+                  emphasize
+                />
+                <SummaryRow
+                  label={t('INVOICES.PREVIEW_BALANCE_DUE')}
+                  value={formatCurrencyWithDecimals(preview.amountDue)}
+                  emphasize
+                />
+              </View>
 
-            {!!String(preview.notes || '').trim() && (
-              <View style={styles.notes}>
-                <StyledText
-                  color={COLORS.TEXT_MUTED}
-                  size={10}
-                  variant="semiBold"
-                  containerStyle={styles.notesLabel}>
-                  {t('INVOICES.PREVIEW_NOTES')}
-                </StyledText>
-                <StyledText
-                  color={COLORS.TEXT_SECONDARY}
-                  size={13}
-                  containerStyle={styles.notesBody}>
-                  {preview.notes}
+              {!!String(preview.notes || '').trim() && (
+                <View style={styles.notes}>
+                  <StyledText
+                    color={COLORS.TEXT_MUTED}
+                    size={10}
+                    variant="semiBold"
+                    containerStyle={styles.notesLabel}>
+                    {t('INVOICES.PREVIEW_NOTES')}
+                  </StyledText>
+                  <StyledText
+                    color={COLORS.TEXT_SECONDARY}
+                    size={13}
+                    containerStyle={styles.notesBody}>
+                    {preview.notes}
+                  </StyledText>
+                </View>
+              )}
+
+              <View style={styles.poweredBy}>
+                <StyledText color={COLORS.TEXT_MUTED} size={11}>
+                  {t('INVOICES.PREVIEW_POWERED_BY')}
                 </StyledText>
               </View>
-            )}
+            </ScrollView>
 
-            <View style={styles.poweredBy}>
-              <StyledText color={COLORS.TEXT_MUTED} size={11}>
-                {t('INVOICES.PREVIEW_POWERED_BY')}
-              </StyledText>
+            <View
+              style={[
+                styles.footer,
+                {paddingBottom: Math.max(insets.bottom, 12)},
+              ]}>
+              <CustomButton
+                title={t('CREATE_INVOICE.SHARE')}
+                onPress={handleShare}
+                isLoading={isSharing}
+                isDisabled={!invoice || isLoading || isSharing}
+                color={COLORS.LOGIN_PRIMARY}
+              />
             </View>
-          </ScrollView>
+          </>
         )}
       </View>
     </Modal>

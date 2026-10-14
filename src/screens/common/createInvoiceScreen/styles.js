@@ -19,7 +19,7 @@ export default StyleSheet.create({
   scrollContent: {
     backgroundColor: COLORS.INVOICE_FORM_BACKGROUND,
     padding: 10,
-    paddingBottom: 122,
+    paddingBottom: 160,
   },
   section: {
     backgroundColor: COLORS.SURFACE,

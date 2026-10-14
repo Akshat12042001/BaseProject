@@ -1,5 +1,5 @@
 import React, {useCallback, useMemo, useState} from 'react';
-import {TouchableOpacity, View} from 'react-native';
+import {Pressable, TouchableOpacity, View} from 'react-native';
 import {useTranslation} from 'react-i18next';
 import Popover, {PopoverPlacement} from 'react-native-popover-view';
 import {StyledText} from '../../atoms';
@@ -30,6 +30,7 @@ const InvoiceCard = ({
   amount,
   settlement,
   onMenuAction,
+  onPress,
 }) => {
   const {t} = useTranslation();
   const [isMenuVisible, setIsMenuVisible] = useState(false);
@@ -61,6 +62,10 @@ const InvoiceCard = ({
     setIsMenuVisible(false);
   }, []);
 
+  const handleCardPress = useCallback(() => {
+    onPress?.(id);
+  }, [id, onPress]);
+
   const handleMenuItemPress = useCallback(
     action => {
       setIsMenuVisible(false);
@@ -70,7 +75,11 @@ const InvoiceCard = ({
   );
 
   return (
-    <View style={styles.card}>
+    <Pressable
+      accessibilityRole="button"
+      disabled={!onPress}
+      onPress={handleCardPress}
+      style={styles.card}>
       <View style={styles.accent} />
       <View style={styles.content}>
         <View style={styles.avatar}>
@@ -179,7 +188,7 @@ const InvoiceCard = ({
           </StyledText>
         </View>
       </View>
-    </View>
+    </Pressable>
   );
 };
 

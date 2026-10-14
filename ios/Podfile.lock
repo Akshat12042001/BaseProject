@@ -24,6 +24,11 @@ PODS:
   - BVLinearGradient (2.8.3):
     - React-Core
   - FBLazyVector (0.86.0)
+  - Google-Maps-iOS-Utils (6.1.0):
+    - GoogleMaps (~> 9.0)
+  - GoogleMaps (9.4.0):
+    - GoogleMaps/Maps (= 9.4.0)
+  - GoogleMaps/Maps (9.4.0)
   - hermes-engine (250829098.0.14):
     - hermes-engine/Pre-built (= 250829098.0.14)
   - hermes-engine/Pre-built (250829098.0.14)
@@ -1584,6 +1589,77 @@ PODS:
     - ReactCommon/turbomodule/core
     - ReactNativeDependencies
     - Yoga
+  - react-native-maps/Generated (1.29.11):
+    - hermes-engine
+    - RCTRequired
+    - RCTTypeSafety
+    - React-Core
+    - React-Core-prebuilt
+    - React-debug
+    - React-Fabric
+    - React-featureflags
+    - React-graphics
+    - React-ImageManager
+    - React-jsi
+    - React-NativeModulesApple
+    - React-RCTFabric
+    - React-renderercss
+    - React-rendererdebug
+    - React-utils
+    - ReactCodegen
+    - ReactCommon/turbomodule/bridging
+    - ReactCommon/turbomodule/core
+    - ReactNativeDependencies
+    - Yoga
+  - react-native-maps/Google (1.29.11):
+    - Google-Maps-iOS-Utils (= 6.1.0)
+    - GoogleMaps (= 9.4.0)
+    - hermes-engine
+    - RCTRequired
+    - RCTTypeSafety
+    - React-Core
+    - React-Core-prebuilt
+    - React-debug
+    - React-Fabric
+    - React-featureflags
+    - React-graphics
+    - React-ImageManager
+    - React-jsi
+    - react-native-maps/Generated
+    - react-native-maps/Maps
+    - React-NativeModulesApple
+    - React-RCTFabric
+    - React-renderercss
+    - React-rendererdebug
+    - React-utils
+    - ReactCodegen
+    - ReactCommon/turbomodule/bridging
+    - ReactCommon/turbomodule/core
+    - ReactNativeDependencies
+    - Yoga
+  - react-native-maps/Maps (1.29.11):
+    - hermes-engine
+    - RCTRequired
+    - RCTTypeSafety
+    - React-Core
+    - React-Core-prebuilt
+    - React-debug
+    - React-Fabric
+    - React-featureflags
+    - React-graphics
+    - React-ImageManager
+    - React-jsi
+    - react-native-maps/Generated
+    - React-NativeModulesApple
+    - React-RCTFabric
+    - React-renderercss
+    - React-rendererdebug
+    - React-utils
+    - ReactCodegen
+    - ReactCommon/turbomodule/bridging
+    - ReactCommon/turbomodule/core
+    - ReactNativeDependencies
+    - Yoga
   - react-native-pdf (7.0.5):
     - hermes-engine
     - RCTRequired
@@ -2072,6 +2148,28 @@ PODS:
     - React-utils (= 0.86.0)
     - ReactNativeDependencies
   - ReactNativeDependencies (0.86.0)
+  - RNCClipboard (1.16.3):
+    - hermes-engine
+    - RCTRequired
+    - RCTTypeSafety
+    - React-Core
+    - React-Core-prebuilt
+    - React-debug
+    - React-Fabric
+    - React-featureflags
+    - React-graphics
+    - React-ImageManager
+    - React-jsi
+    - React-NativeModulesApple
+    - React-RCTFabric
+    - React-renderercss
+    - React-rendererdebug
+    - React-utils
+    - ReactCodegen
+    - ReactCommon/turbomodule/bridging
+    - ReactCommon/turbomodule/core
+    - ReactNativeDependencies
+    - Yoga
   - RNGestureHandler (3.0.1):
     - hermes-engine
     - RCTRequired
@@ -2451,6 +2549,7 @@ DEPENDENCIES:
   - react-native-date-picker (from `../node_modules/react-native-date-picker`)
   - "react-native-document-picker (from `../node_modules/@react-native-documents/picker`)"
   - react-native-image-picker (from `../node_modules/react-native-image-picker`)
+  - react-native-maps/Google (from `../node_modules/react-native-maps`)
   - react-native-pdf (from `../node_modules/react-native-pdf`)
   - react-native-safe-area-context (from `../node_modules/react-native-safe-area-context`)
   - React-NativeModulesApple (from `../node_modules/react-native/ReactCommon/react/nativemodule/core/platform/ios`)
@@ -2488,6 +2587,7 @@ DEPENDENCIES:
   - ReactCodegen (from `build/generated/ios/ReactCodegen`)
   - ReactCommon/turbomodule/core (from `../node_modules/react-native/ReactCommon`)
   - ReactNativeDependencies (from `../node_modules/react-native/third-party-podspecs/ReactNativeDependencies.podspec`)
+  - "RNCClipboard (from `../node_modules/@react-native-clipboard/clipboard`)"
   - RNGestureHandler (from `../node_modules/react-native-gesture-handler`)
   - RNReanimated (from `../node_modules/react-native-reanimated`)
   - RNScreens (from `../node_modules/react-native-screens`)
@@ -2496,6 +2596,11 @@ DEPENDENCIES:
   - RNVectorIcons (from `../node_modules/react-native-vector-icons`)
   - RNWorklets (from `../node_modules/react-native-worklets`)
   - Yoga (from `../node_modules/react-native/ReactCommon/yoga`)
+
+SPEC REPOS:
+  trunk:
+    - Google-Maps-iOS-Utils
+    - GoogleMaps
 
 EXTERNAL SOURCES:
   AsyncStorage:
@@ -2593,6 +2698,8 @@ EXTERNAL SOURCES:
     :path: "../node_modules/@react-native-documents/picker"
   react-native-image-picker:
     :path: "../node_modules/react-native-image-picker"
+  react-native-maps:
+    :path: "../node_modules/react-native-maps"
   react-native-pdf:
     :path: "../node_modules/react-native-pdf"
   react-native-safe-area-context:
@@ -2667,6 +2774,8 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native/ReactCommon"
   ReactNativeDependencies:
     :podspec: "../node_modules/react-native/third-party-podspecs/ReactNativeDependencies.podspec"
+  RNCClipboard:
+    :path: "../node_modules/@react-native-clipboard/clipboard"
   RNGestureHandler:
     :path: "../node_modules/react-native-gesture-handler"
   RNReanimated:
@@ -2688,6 +2797,8 @@ SPEC CHECKSUMS:
   AsyncStorage: 163ab23f6aa37a58b7f2379d0b4ee7ac84d6655c
   BVLinearGradient: cb006ba232a1f3e4f341bb62c42d1098c284da70
   FBLazyVector: b3e7ad108f0d882e30445c5527d774e3fd432f3d
+  Google-Maps-iOS-Utils: 0a484b05ed21d88c9f9ebbacb007956edd508a96
+  GoogleMaps: 0608099d4870cac8754bdba9b6953db543432438
   hermes-engine: c9d5537040bb0fe8486f12f38d8268fd08cec8a3
   HtmlToPdf: 32f1a9bc86f222c5e9288c06ffad44925be76393
   RCTDeprecation: 2a74a2c57675e64419bd89078efde81f7c1de90b
@@ -2732,6 +2843,7 @@ SPEC CHECKSUMS:
   react-native-date-picker: 11c5a0b2a0a54a213d6bb4067bf3df4962c714d4
   react-native-document-picker: c3a7536f3ee52525b4714c3720537f941d0cb094
   react-native-image-picker: 23540feacc79c63c60857f318fdfa8477c26e70a
+  react-native-maps: bf70cdeb6a5cf6e7c7a97c760c8f51a56ac9a4af
   react-native-pdf: c9fa724df597c1c4c456590953fc7224aee6e202
   react-native-safe-area-context: fb5c8ee9f6dd62ef710611b3d370c501f42a4ac0
   React-NativeModulesApple: a092d89b58f635ebfab88048b0eda9fb516819fd
@@ -2769,6 +2881,7 @@ SPEC CHECKSUMS:
   ReactCodegen: afe0d436ee089d7bea6418429d8312b1d23a6801
   ReactCommon: d5c1bb4427bf51c443de5926aac332c89ddd9363
   ReactNativeDependencies: fa0a54b3f5319ae0e3b9aff32bfee7a424b88e66
+  RNCClipboard: 715fa7c6c8366f17d00f05a439ee7488f390fa5f
   RNGestureHandler: 1fac5cb6e78ca6836f4c0b9beba31b10490c70ce
   RNReanimated: 5aa9e73d0f8d3c40d5c9bec396d6a61098db31f0
   RNScreens: 991cc417cd396602a6cf59a42139e5a9d91462a9
@@ -2778,6 +2891,6 @@ SPEC CHECKSUMS:
   RNWorklets: 0000755d812f23d0fc703319e2b1f65d9204c954
   Yoga: fe50ab299e578f397fef753cf309c6703a4db29b
 
-PODFILE CHECKSUM: 9f9795e3754509b057df671e1b69ec7b01ae9668
+PODFILE CHECKSUM: 75d0003d3f56bfb4aca02805ff8a255e741b3e55
 
-COCOAPODS: 1.16.2
+COCOAPODS: 1.15.2

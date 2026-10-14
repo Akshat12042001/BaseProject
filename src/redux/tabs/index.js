@@ -8,4 +8,5 @@ export {
     useGetHostPendingReviewsQuery,
     useGetFoodMenuQuery,
     useGetHostDirectBookingsQuery,
+    useGetNotificationsQuery,
   } from './api';

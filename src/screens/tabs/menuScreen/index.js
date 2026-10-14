@@ -290,9 +290,10 @@ const MenuScreen = () => {
         isActiveUpdating={activeUpdatingId === item.id}
         onActiveChange={handleActiveChange}
         onMenuAction={handleMenuAction}
+        onPress={handlePreviewMenu}
       />
     ),
-    [activeUpdatingId, handleActiveChange, handleMenuAction, t],
+    [activeUpdatingId, handleActiveChange, handleMenuAction, handlePreviewMenu, t],
   );
 
   const renderEmpty = useCallback(() => {

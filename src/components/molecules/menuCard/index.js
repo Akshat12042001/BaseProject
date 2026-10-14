@@ -1,5 +1,5 @@
 import React, {useCallback, useState} from 'react';
-import {Image, TouchableOpacity, View} from 'react-native';
+import {Image, Pressable, TouchableOpacity, View} from 'react-native';
 import {useTranslation} from 'react-i18next';
 import Popover, {PopoverPlacement} from 'react-native-popover-view';
 import {AnimatedSwitch, StyledText} from '../../atoms';
@@ -20,6 +20,7 @@ const MenuCard = ({
   isActiveUpdating = false,
   onActiveChange,
   onMenuAction,
+  onPress,
 }) => {
   const {t} = useTranslation();
   const [isMenuVisible, setIsMenuVisible] = useState(false);
@@ -40,6 +41,10 @@ const MenuCard = ({
     [id, onMenuAction],
   );
 
+  const handleCardPress = useCallback(() => {
+    onPress?.(id);
+  }, [id, onPress]);
+
   const handleActivePress = useCallback(
     nextValue => {
       onActiveChange?.(id, nextValue);
@@ -48,7 +53,11 @@ const MenuCard = ({
   );
 
   return (
-    <View style={styles.card}>
+    <Pressable
+      accessibilityRole="button"
+      disabled={!onPress}
+      onPress={handleCardPress}
+      style={styles.card}>
       <Image
         source={templateImage}
         style={styles.templateImage}
@@ -155,7 +164,7 @@ const MenuCard = ({
           </View>
         )}
       </View>
-    </View>
+    </Pressable>
   );
 };
 

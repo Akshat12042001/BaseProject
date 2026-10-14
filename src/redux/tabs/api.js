@@ -10,6 +10,7 @@ const ENDPOINTS = {
   HOST_PENDING_REVIEWS: '/reviews/host/pending',
   FOOD_MENU: '/food-menus',
   HOST_DIRECT_BOOKINGS: '/deals/host/direct-bookings',
+  NOTIFICATIONS: '/notification',
 };
 
 
@@ -95,6 +96,13 @@ const baseQuery = fetchBaseQuery({
           params: data,
         }),
       }),
+      getNotifications: builder.query({
+        query: params => ({
+          url: ENDPOINTS.NOTIFICATIONS,
+          method: 'GET',
+          params,
+        }),
+      }),
       getHostDirectBookings: builder.query({
         query: data => ({
           url: ENDPOINTS.HOST_DIRECT_BOOKINGS,
@@ -138,4 +146,5 @@ const baseQuery = fetchBaseQuery({
     useGetHostPendingReviewsQuery,
     useGetFoodMenuQuery,
     useGetHostDirectBookingsQuery,
+    useGetNotificationsQuery,
   } = tabsApi;

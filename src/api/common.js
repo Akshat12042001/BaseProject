@@ -6,7 +6,9 @@ const ENDPOINTS = {
   UPLOAD_LOGO: '/gemini/upload',
   GENERATE_LOGO: '/gemini/generate',
   UPDATE_GENERATED_LOGO: '/gemini/update/generated/logo',
+  CANCELLATION_POLICIES: '/homestays/cancellation-policies',
   HOST_LISTING_DETAIL: '/homestays/host/listings',
+  HOMESTAY: '/homestays',
   HOST_LISTINGS_DROPDOWN: '/homestays/host/listings/dropdown',
   REVIEWS: '/reviews',
   HOST_PENDING_REVIEWS: '/reviews/host/pending',
@@ -15,6 +17,11 @@ const ENDPOINTS = {
   HOST_DIRECT_BOOKINGS: '/deals/host/direct-bookings',
   HOST_BOOKINGS: '/deals/host/bookings',
   DEAL_PREVIEW: '/deals',
+  NOTIFICATIONS: '/notification',
+  AMENITIES: '/homestays/amenities/all',
+  STATES: '/locations/states',
+  REWARDS: '/points/me/transactions',
+  REWARDS_SUMMARY: '/points/me',
 };
 
 
@@ -56,6 +63,18 @@ export const makeUploadLogoRequest = file => {
         'Content-Type': 'multipart/form-data',
       },
     })
+    .then(res => res.data);
+};
+
+export const makeGetRewardsRequest = data => {
+  return APIClient()
+    .get(ENDPOINTS.REWARDS, {params: data})
+    .then(res => res.data);
+};
+
+export const makeGetRewardsSummaryRequest = () => {
+  return APIClient()
+    .get(ENDPOINTS.REWARDS_SUMMARY)
     .then(res => res.data);
 };
 
@@ -163,6 +182,87 @@ export const makeGetPropertyDetailRequest = id => {
     .then(res => res.data);
 };
 
+export const makeCreateHomestayRequest = data => {
+  return APIClient()
+    .post(ENDPOINTS.HOMESTAY, data)
+    .then(res => res.data);
+};
+
+export const makeUpdateHomestayRequest = (id, data) => {
+  return APIClient()
+    .put(`${ENDPOINTS.HOMESTAY}/${id}`, data)
+    .then(res => res.data);
+};
+
+export const makeDeleteHomestayRequest = id => {
+  return APIClient()
+    .delete(`${ENDPOINTS.HOMESTAY}/${id}`)
+    .then(res => res.data);
+};
+
+export const makeDeleteHomestayImageRequest = (homestayId, imageId) => {
+  return APIClient()
+    .delete(`${ENDPOINTS.HOMESTAY}/${homestayId}/images/${imageId}`)
+    .then(res => res.data);
+};
+
+const imageFileName = file => {
+  const type = file?.type || 'image/jpeg';
+  const extension = type.split('/')[1] === 'jpeg' ? 'jpg' : type.split('/')[1] || 'jpg';
+  const name = file?.name || `photo.${extension}`;
+
+  if (/\.[a-zA-Z0-9]+$/.test(name)) {
+    return name;
+  }
+
+  return `${name}.${extension}`;
+};
+
+export const makeUploadHomestayImagesRequest = (homestayId, files) => {
+  const formData = new FormData();
+
+  files.forEach(file => {
+    formData.append('images', {
+      uri: file.uri,
+      name: imageFileName(file),
+      type: file.type || 'image/jpeg',
+    });
+  });
+
+  return APIClient()
+    .post(`${ENDPOINTS.HOMESTAY}/${homestayId}/images/upload`, formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+      timeout: 120000,
+    })
+    .then(res => res.data);
+};
+
+export const makeGetStatesRequest = () => {
+  return APIClient()
+    .get(ENDPOINTS.STATES)
+    .then(res => res.data);
+};
+
+export const makeGetStateCitiesRequest = stateId => {
+  return APIClient()
+    .get(`${ENDPOINTS.STATES}/${stateId}/cities`)
+    .then(res => res.data);
+};
+
+export const makeGetAmenitiesRequest = () => {
+  return APIClient()
+    .get(ENDPOINTS.AMENITIES)
+    .then(res => res.data);
+};
+
+export const makeGetCancellationPoliciesRequest = () => {
+  return APIClient()
+    .get(ENDPOINTS.CANCELLATION_POLICIES)
+    .then(res => res.data);
+};
+
 export const makeGetHostListingsDropdownRequest = params => {
   return APIClient()
     .get(ENDPOINTS.HOST_LISTINGS_DROPDOWN, {params})
@@ -204,6 +304,12 @@ export const makeDeleteHostBookingRequest = bookingId => {
 export const makeUpdateHostBookingRequest = (bookingId, data) => {
   return APIClient()
     .patch(`${ENDPOINTS.HOST_BOOKINGS}/${bookingId}`, data)
+    .then(res => res.data);
+};
+
+export const makeMarkNotificationReadRequest = notificationId => {
+  return APIClient()
+    .put(`${ENDPOINTS.NOTIFICATIONS}/${notificationId}`)
     .then(res => res.data);
 };
 

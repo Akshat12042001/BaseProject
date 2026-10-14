@@ -261,7 +261,7 @@ export const buildUpdateHostBookingPayload = ({
     guest: {
       firstName,
       lastName,
-      email: String(email || '').trim(),
+      email: email ? String(email || '').trim() : null,
     },
     terms: {
       checkIn: moment(checkIn).format('YYYY-MM-DD'),

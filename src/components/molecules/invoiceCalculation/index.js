@@ -44,11 +44,13 @@ const InvoiceCalculation = ({
           onChangeText={onTaxRateChange}
           keyboardType="decimal-pad"
           rightIcon={
-            <StyledText color={COLORS.TEXT_SECONDARY} size={16}>
+            <StyledText color={COLORS.TEXT_SECONDARY} size={13}>
               %
             </StyledText>
           }
           containerStyles={styles.taxInput}
+          inputStyle={styles.taxRateField}
+          rightIconStyle={styles.taxRateIcon}
           borderColor={COLORS.INVOICE_FORM_FIELD_BORDER}
           focusedBorderColor={COLORS.LOGIN_PRIMARY}
         />
@@ -69,11 +71,13 @@ const InvoiceCalculation = ({
           onChangeText={onDiscountRateChange}
           keyboardType="decimal-pad"
           rightIcon={
-            <StyledText color={COLORS.TEXT_SECONDARY} size={16}>
+            <StyledText color={COLORS.TEXT_SECONDARY} size={13}>
               %
             </StyledText>
           }
           containerStyles={styles.taxInput}
+          inputStyle={styles.taxRateField}
+          rightIconStyle={styles.taxRateIcon}
           borderColor={COLORS.INVOICE_FORM_FIELD_BORDER}
           focusedBorderColor={COLORS.LOGIN_PRIMARY}
         />

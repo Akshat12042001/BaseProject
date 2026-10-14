@@ -5,6 +5,7 @@ export default StyleSheet.create({
   main: {
     marginBottom: 15,
     position: 'relative',
+    zIndex: 1,
   },
   inputField: {
     height: 54,
@@ -15,6 +16,9 @@ export default StyleSheet.create({
     fontFamily: FONTS.regular,
     color: COLORS.GREYSCALE_900,
     marginTop: 8,
+  },
+  inputWithoutLabel: {
+    marginTop: 0,
   },
   inputWithLeftIcon: {
     paddingLeft: 44,
@@ -29,6 +33,11 @@ export default StyleSheet.create({
     position: 'absolute',
     top: 0,
     zIndex: 2,
+  },
+  requiredMark: {
+    color: COLORS.RED_ERROR,
+    fontSize: 12,
+    fontFamily: FONTS.regular,
   },
   leftIcon: {
     left: 15,
@@ -80,7 +89,7 @@ export default StyleSheet.create({
   passwordIcon: {
     position: 'absolute',
     top: 25,
-    zIndex: 1,
+    // zIndex: 1,
     right: 20,
   },
 });

@@ -15,6 +15,11 @@ if linkage != nil
 end
 
 target 'Boonies' do
+  # React Native Maps dependencies (Google Maps on iOS)
+  # https://github.com/react-native-maps/react-native-maps/blob/HEAD/docs/installation.md
+  rn_maps_path = '../node_modules/react-native-maps'
+  pod 'react-native-maps/Google', :path => rn_maps_path
+
   config = use_native_modules!
 
   use_react_native!(

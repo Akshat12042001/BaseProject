@@ -15,6 +15,7 @@ export default forwardRef(
       editable = true,
       onPress,
       label = '',
+      required = false,
       value = '',
       onChangeText = undefined,
       leftIcon = null,
@@ -22,6 +23,7 @@ export default forwardRef(
       placeholder = '',
       containerStyles = {},
       inputStyle = {},
+      rightIconStyle = {},
       borderColor = COLORS.PRIMARY_LIGHT,
       focusedBorderColor = COLORS.PRIMARY,
       inputTextColor = COLORS.GREYSCALE_900,
@@ -73,14 +75,17 @@ export default forwardRef(
       : COLORS.GREYSCALE_500;
 
     return (
-      <Pressable style={[styles.main, containerStyles]} onPress={onPress}>
-        <StyledText
-          size={12}
-          color={labelColor}
-          variant="regular"
-          containerStyle={styles.labelContainer}>
-          {label}
-        </StyledText>
+      <Pressable style={[styles.main, containerStyles]} onPress={onPress} hitSlop={SharedStyles.hitSlop10}>
+        {!!label && (
+          <StyledText
+            size={12}
+            color={labelColor}
+            variant="regular"
+            containerStyle={styles.labelContainer}>
+            {label}
+            {required ? <Text style={styles.requiredMark}> **</Text> : null}
+          </StyledText>
+        )}
         {!!leftIcon && <View style={styles.leftIcon}>{leftIcon}</View>}
         <TextInput
           ref={ref}
@@ -98,6 +103,7 @@ export default forwardRef(
           multiline={multiline}
           style={[
             styles.inputField,
+            !label && styles.inputWithoutLabel,
             {
               borderColor: currentBorderColor,
               color: inputTextColor,
@@ -110,7 +116,7 @@ export default forwardRef(
         />
         {hasRightIcon && (
           <TouchableOpacity
-            style={styles.passwordIcon}
+            style={[styles.passwordIcon, rightIconStyle]}
             hitSlop={SharedStyles.hitSlop10}
             onPress={handleRightIconPress}>
             {rightIcon || (isSecure ? <EyeClose /> : <EyeOpen size="20" />)}

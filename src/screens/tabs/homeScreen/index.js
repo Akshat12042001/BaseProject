@@ -3,6 +3,7 @@ import {FlatList, ScrollView, TouchableOpacity, View} from 'react-native';
 import Skeleton from 'react-native-reanimated-skeleton';
 import {useTranslation} from 'react-i18next';
 import {ScreenContainer, StyledText} from '../../../components/atoms';
+import {DeletePropertyModal} from '../../../components/modals';
 import {PROPERTY_CARD_ACTION, PropertyCard} from '../../../components/molecules';
 import {
   ArrowRightIcon,
@@ -18,14 +19,19 @@ import {
 import {COLORS, NAVIGATION, SCREEN} from '../../../constants';
 import styles from './styles';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
-import {useGetDashboardQuery} from '../../../redux/tabs/api';
+import {useGetDashboardQuery, useGetNotificationsQuery} from '../../../redux/tabs/api';
 import {useFocusEffect, useNavigation} from '@react-navigation/native';
 import {useDispatch, useSelector} from 'react-redux';
 import moment from 'moment';
 import {makeMeRequest} from '../../../api/auth';
+import {makeDeleteHomestayRequest} from '../../../api/common';
 import {setUserData} from '../../../redux/auth/auth.reducer';
+import {errorToast, successToast} from '../../../utils/alerts';
 import {getTimeBasedGreetingKey} from '../../../utils/greeting';
 import {formatCurrency} from '../../../utils/invoice';
+
+const NOTIFICATION_QUERY = {limit: 10, page: 1};
+const POPOVER_CLOSE_DELAY_MS = 500;
 
 const STATS_SKELETON_LAYOUT = [
   {
@@ -97,12 +103,23 @@ const HomeScreen = () => {
   const navigation = useNavigation();
   const {data: dashboardData, isLoading, refetch: refetchDashboard} =
     useGetDashboardQuery();
+  const {data: notificationsResponse, refetch: refetchNotifications} =
+    useGetNotificationsQuery(NOTIFICATION_QUERY);
   const user = useSelector(state => state.auth.user);
   const dispatch = useDispatch();
   const recentProperties = dashboardData?.recentProperties || [];
   const [greetingKey, setGreetingKey] = useState(getTimeBasedGreetingKey);
+  const [deleteTarget, setDeleteTarget] = useState(null);
+  const [deletingPropertyId, setDeletingPropertyId] = useState(null);
 
   const quickStats = dashboardData?.quickStats || {};
+  const hasUnreadNotifications = useMemo(
+    () =>
+      (notificationsResponse?.data || []).some(
+        notification => notification?.status === false,
+      ),
+    [notificationsResponse],
+  );
 
   const quickStatsData = useMemo(
     () => [
@@ -227,7 +244,8 @@ const HomeScreen = () => {
     useCallback(() => {
       setGreetingKey(getTimeBasedGreetingKey());
       refetchDashboard();
-    }, [refetchDashboard]),
+      refetchNotifications();
+    }, [refetchDashboard, refetchNotifications]),
   );
 
   const fetchMe = useCallback(async () => {
@@ -260,6 +278,35 @@ const HomeScreen = () => {
     [navigation],
   );
 
+  const handleCloseDeleteModal = useCallback(() => {
+    if (deletingPropertyId) {
+      return;
+    }
+    setDeleteTarget(null);
+  }, [deletingPropertyId]);
+
+  const handleConfirmDelete = useCallback(async () => {
+    const propertyId = deleteTarget?.id;
+
+    if (!propertyId || deletingPropertyId) {
+      return;
+    }
+
+    try {
+      setDeletingPropertyId(propertyId);
+      const response = await makeDeleteHomestayRequest(propertyId);
+      successToast(response?.message || t('PROPERTIES.DELETE_SUCCESS'));
+      setDeleteTarget(null);
+      refetchDashboard();
+    } catch (error) {
+      if (!error?.response?.data?.message) {
+        errorToast(t('PROPERTIES.DELETE_FAILED'));
+      }
+    } finally {
+      setDeletingPropertyId(null);
+    }
+  }, [deleteTarget?.id, deletingPropertyId, refetchDashboard, t]);
+
   const handlePropertyMenuAction = useCallback(
     (action, propertyId) => {
       if (action === PROPERTY_CARD_ACTION.PREVIEW) {
@@ -269,9 +316,30 @@ const HomeScreen = () => {
 
       if (action === PROPERTY_CARD_ACTION.VIEW_LISTING) {
         openPropertyDetail(propertyId, true);
+        return;
       }
+
+      if (action === PROPERTY_CARD_ACTION.EDIT) {
+        navigation.navigate(NAVIGATION.STACKS.COMMON, {
+          screen: NAVIGATION.COMMON.CREATE_LISTING_SCREEN,
+          params: {listingId: propertyId},
+        });
+        return;
+      }
+
+      if (action !== PROPERTY_CARD_ACTION.DELETE) {
+        return;
+      }
+
+      const property = recentProperties.find(item => item.id === propertyId);
+      setTimeout(() => {
+        setDeleteTarget({
+          id: propertyId,
+          listingName: property?.title || '',
+        });
+      }, POPOVER_CLOSE_DELAY_MS);
     },
-    [openPropertyDetail],
+    [navigation, openPropertyDetail, recentProperties],
   );
 
   const renderProperty = useCallback(
@@ -291,6 +359,30 @@ const HomeScreen = () => {
     [handlePropertyMenuAction, openPropertyDetail, t],
   );
 
+  const handleQuickStatPress = useCallback(
+    (id) => {
+      switch (id) {
+        case 'properties':
+          navigation.navigate(NAVIGATION.TABS.PROPERTIES_SCREEN);
+          break;
+        case 'bookings':
+          navigation.navigate(NAVIGATION.STACKS.COMMON,{
+            screen: NAVIGATION.COMMON.BOOKING_SCREEN,
+          });
+          break;
+        case 'bills':
+          navigation.navigate(NAVIGATION.TABS.INVOICES_SCREEN);
+          break;
+        case 'rewards':
+          navigation.navigate(NAVIGATION.STACKS.COMMON,{
+            screen: NAVIGATION.COMMON.REWARDS_SCREEN,
+          });
+          break;
+      }
+    },
+    [navigation],
+  );
+
   const renderQuickStatCard = useCallback(
     ({
       label,
@@ -300,8 +392,9 @@ const HomeScreen = () => {
       iconColor,
       iconBackground,
       valueColor,
+      onPress
     }) => (
-      <View style={styles.quickStatCard}>
+      <TouchableOpacity style={styles.quickStatCard} onPress={onPress}>
         <View style={[styles.quickStatIconWrap, {backgroundColor: iconBackground}]}>
           <Icon color={iconColor} size={15} />
         </View>
@@ -322,7 +415,7 @@ const HomeScreen = () => {
         <StyledText color={COLORS.TEXT_MUTED} size={9} variant="medium">
           {subtitle}
         </StyledText>
-      </View>
+      </TouchableOpacity>
     ),
     [],
   );
@@ -370,9 +463,11 @@ const HomeScreen = () => {
                 {t(greetingKey, {name: user?.firstName})}
               </StyledText>
             </View>
-            <View style={styles.notification}>
-              <BellIcon />
-            </View>
+            <TouchableOpacity style={styles.notification} onPress={() => navigation.navigate(NAVIGATION.STACKS.COMMON,{
+              screen: NAVIGATION.COMMON.NOTIFICATION_SCREEN,
+            })}>
+              <BellIcon showIndicator={hasUnreadNotifications} />
+            </TouchableOpacity>
           </View>
         </View>
 
@@ -401,7 +496,7 @@ const HomeScreen = () => {
                     ]}>
                     {row.map(stat => (
                       <View key={stat.id} style={styles.quickStatWrapper}>
-                        {renderQuickStatCard(stat)}
+                        {renderQuickStatCard({...stat, onPress: () => handleQuickStatPress(stat.id)})}
                       </View>
                     ))}
                   </View>
@@ -474,6 +569,14 @@ const HomeScreen = () => {
           </Skeleton>
         </ScrollView>
       </View>
+
+      <DeletePropertyModal
+        isVisible={Boolean(deleteTarget)}
+        listingName={deleteTarget?.listingName}
+        isDeleting={Boolean(deletingPropertyId)}
+        onCancel={handleCloseDeleteModal}
+        onConfirm={handleConfirmDelete}
+      />
     </ScreenContainer>
   );
 };

@@ -46,3 +46,8 @@ export {default as DollarCircleIcon} from './dollarCircleIcon';
 export {default as LogoutIcon} from './logoutIcon';
 export {default as TagIcon} from './tagIcon';
 export {default as WhatsAppIcon} from './whatsAppIcon';
+export {default as SupportIcon} from './supportIcon';
+export {default as PhoneIcon} from './phoneIcon';
+export {default as TrophyIcon} from './trophyIcon';
+export {default as TrendUpIcon} from './trendUpIcon';
+export {default as TrendDownIcon} from './trendDownIcon';

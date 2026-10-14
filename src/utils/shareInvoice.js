@@ -3,8 +3,13 @@ import Share from 'react-native-share';
 import createInvoiceHtml from './invoiceHtml';
 
 const getFileName = invoice => {
-  const identifier = invoice?.invoiceNo || invoice?.id || Date.now();
-  return `invoice-${String(identifier).replace(/[^a-zA-Z0-9-_]/g, '-')}`;
+  const guestName = String(invoice?.to || '')
+    .trim()
+    .replace(/[\\/:*?"<>|]/g, '')
+    .replace(/\s+/g, ' ');
+  const safeName = guestName || invoice?.invoiceNo || invoice?.id || 'Guest';
+
+  return `Invoice-${safeName}`;
 };
 
 const getFileUrl = filePath =>
@@ -17,6 +22,8 @@ export const shareInvoice = async (invoice, title = 'Share invoice') => {
     fileName,
     width: 595,
     height: 842,
+    padding: 0,
+    bgColor: '#FFFFFF',
     shouldPrintBackgrounds: true,
   });
 

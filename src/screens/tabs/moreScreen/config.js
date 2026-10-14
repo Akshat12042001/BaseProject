@@ -1,4 +1,4 @@
-import { CalendarIcon, LogoutIcon } from "../../../components/svgs";
+import { CalendarIcon, LogoutIcon, SupportIcon } from "../../../components/svgs";
 import { COLORS } from "../../../constants";
 
 const DATA = [
@@ -9,6 +9,11 @@ const DATA = [
   },
   {
     id: 2,
+    title: 'Support',
+    icon:<SupportIcon color={COLORS.PRIMARY} size={20} />
+  },
+  {
+    id: 3,
     title: 'Logout',
     icon:<LogoutIcon color={COLORS.RED_ERROR} size={20} />
   },

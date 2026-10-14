@@ -28,7 +28,10 @@ export default StyleSheet.create({
     marginHorizontal: 8,
     textAlign: 'center',
   },
-  headerSpacer: {
+  shareButton: {
+    alignItems: 'center',
+    height: 36,
+    justifyContent: 'center',
     width: 36,
   },
   pdf: {

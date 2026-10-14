@@ -5,6 +5,7 @@ import {COLORS} from '../../constants';
 const BellIcon = ({
   color = COLORS.SURFACE,
   accentColor = COLORS.NOTIFICATION_ACCENT,
+  showIndicator = false,
   ...props
 }) => (
   <Svg width={22} height={22} viewBox="0 0 24 24" fill="none" {...props}>
@@ -20,7 +21,7 @@ const BellIcon = ({
       strokeWidth={1.6}
       strokeLinecap="round"
     />
-    <Circle cx={18.5} cy={5.5} r={2.2} fill={accentColor} />
+    {showIndicator ? <Circle cx={18.5} cy={5.5} r={2.2} fill={accentColor} /> : null}
   </Svg>
 );
 

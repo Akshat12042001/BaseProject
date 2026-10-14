@@ -9,7 +9,7 @@ import {
 import Skeleton from 'react-native-reanimated-skeleton';
 import {useTranslation} from 'react-i18next';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
-import {useNavigation} from '@react-navigation/native';
+import {useFocusEffect, useNavigation} from '@react-navigation/native';
 import {useSelector} from 'react-redux';
 import {
   ActionLoadingOverlay,
@@ -76,6 +76,7 @@ const InvoicesScreen = () => {
   const [isPopoverLoading, setIsPopoverLoading] = useState(false);
   const [isPreviewVisible, setIsPreviewVisible] = useState(false);
   const [previewData, setPreviewData] = useState(null);
+  const [previewInvoice, setPreviewInvoice] = useState(null);
   const [isPreviewLoading, setIsPreviewLoading] = useState(false);
   const {
     data: billsResponse,
@@ -105,20 +106,36 @@ const InvoicesScreen = () => {
     [navigation],
   );
 
+
+  useFocusEffect(
+    useCallback(() => {
+      refetch();
+    }, [refetch]),
+  );
+
+
   const handleClosePreviewModal = useCallback(() => {
     setIsPreviewVisible(false);
     setPreviewData(null);
+    setPreviewInvoice(null);
     setIsPreviewLoading(false);
   }, []);
 
   const handleOpenPreviewBill = useCallback(
     async billId => {
       setPreviewData(null);
+      setPreviewInvoice(null);
       setIsPreviewVisible(true);
       setIsPreviewLoading(true);
 
       try {
         const response = await makeGetBillDetailsRequest(billId);
+        const bill = response?.data || response || {};
+        setPreviewInvoice({
+          ...bill,
+          payment_terms: bill.payment_terms || bill.paymentTerms || '',
+          homestayLogo: user?.homestayLogo || '',
+        });
         setPreviewData(
           formatBillPreview(response, {
             homestayLogo: user?.homestayLogo || '',
@@ -128,6 +145,7 @@ const InvoicesScreen = () => {
         // APIClient displays the server error toast.
         setIsPreviewVisible(false);
         setPreviewData(null);
+        setPreviewInvoice(null);
       } finally {
         setIsPreviewLoading(false);
       }
@@ -320,10 +338,11 @@ const InvoicesScreen = () => {
                 })
           }
           onMenuAction={handleInvoiceMenuAction}
+          onPress={handleOpenPreviewBill}
         />
       );
     },
-    [handleInvoiceMenuAction, t],
+    [handleInvoiceMenuAction, handleOpenPreviewBill, t],
   );
 
   const handleLoadMore = useCallback(() => {
@@ -439,7 +458,7 @@ const InvoicesScreen = () => {
           ListEmptyComponent={renderEmpty}
           refreshControl={
             <RefreshControl
-              refreshing={isFetching && page === 1 && !isLoading}
+              refreshing={isLoading}
               onRefresh={handleRefresh}
               tintColor={COLORS.LOGIN_PRIMARY}
               colors={[COLORS.LOGIN_PRIMARY]}
@@ -452,6 +471,7 @@ const InvoicesScreen = () => {
 
       <PreviewBillModal
         data={previewData}
+        invoice={previewInvoice}
         isLoading={isPreviewLoading}
         isVisible={isPreviewVisible}
         onClose={handleClosePreviewModal}

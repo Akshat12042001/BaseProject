@@ -1,8 +1,7 @@
-import React, {useCallback, useMemo} from 'react';
+import React, {useCallback, useMemo, useState} from 'react';
 import {
   ActivityIndicator,
   FlatList,
-  RefreshControl,
   TouchableOpacity,
   View,
 } from 'react-native';
@@ -10,10 +9,13 @@ import {useFocusEffect, useNavigation} from '@react-navigation/native';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import {useTranslation} from 'react-i18next';
 import {ScreenContainer, StyledText} from '../../../components/atoms';
+import {DeletePropertyModal} from '../../../components/modals';
 import {PROPERTY_CARD_ACTION, PropertyCard} from '../../../components/molecules';
 import {PlusIcon} from '../../../components/svgs';
 import {COLORS, NAVIGATION} from '../../../constants';
+import {makeDeleteHomestayRequest} from '../../../api/common';
 import {useGetMyPropertiesQuery} from '../../../redux/tabs';
+import {errorToast, successToast} from '../../../utils/alerts';
 import {
   getProperties,
   getPropertyCancellationLabel,
@@ -22,6 +24,7 @@ import {
 import styles from './styles';
 
 const keyExtractor = item => item.id;
+const POPOVER_CLOSE_DELAY_MS = 500;
 
 const PropertySeparator = () => <View style={styles.separator} />;
 
@@ -29,10 +32,11 @@ const PropertiesScreen = () => {
   const {t} = useTranslation();
   const navigation = useNavigation();
   const insets = useSafeAreaInsets();
+  const [deleteTarget, setDeleteTarget] = useState(null);
+  const [deletingPropertyId, setDeletingPropertyId] = useState(null);
   const {
     data: propertiesResponse,
     isError,
-    isFetching,
     isLoading,
     refetch,
   } = useGetMyPropertiesQuery({page: 1, limit: 100});
@@ -65,6 +69,35 @@ const PropertiesScreen = () => {
     [navigation],
   );
 
+  const handleCloseDeleteModal = useCallback(() => {
+    if (deletingPropertyId) {
+      return;
+    }
+    setDeleteTarget(null);
+  }, [deletingPropertyId]);
+
+  const handleConfirmDelete = useCallback(async () => {
+    const propertyId = deleteTarget?.id;
+
+    if (!propertyId || deletingPropertyId) {
+      return;
+    }
+
+    try {
+      setDeletingPropertyId(propertyId);
+      const response = await makeDeleteHomestayRequest(propertyId);
+      successToast(response?.message || t('PROPERTIES.DELETE_SUCCESS'));
+      setDeleteTarget(null);
+      refetch();
+    } catch (error) {
+      if (!error?.response?.data?.message) {
+        errorToast(t('PROPERTIES.DELETE_FAILED'));
+      }
+    } finally {
+      setDeletingPropertyId(null);
+    }
+  }, [deleteTarget?.id, deletingPropertyId, refetch, t]);
+
   const handleMenuAction = useCallback(
     (action, propertyId) => {
       if (action === PROPERTY_CARD_ACTION.PREVIEW) {
@@ -74,9 +107,30 @@ const PropertiesScreen = () => {
 
       if (action === PROPERTY_CARD_ACTION.VIEW_LISTING) {
         openPropertyDetail(propertyId, true);
+        return;
       }
+
+      if (action === PROPERTY_CARD_ACTION.EDIT) {
+        navigation.navigate(NAVIGATION.STACKS.COMMON, {
+          screen: NAVIGATION.COMMON.CREATE_LISTING_SCREEN,
+          params: {listingId: propertyId},
+        });
+        return;
+      }
+
+      if (action !== PROPERTY_CARD_ACTION.DELETE) {
+        return;
+      }
+
+      const property = properties.find(item => item.id === propertyId);
+      setTimeout(() => {
+        setDeleteTarget({
+          id: propertyId,
+          listingName: property?.title || '',
+        });
+      }, POPOVER_CLOSE_DELAY_MS);
     },
-    [openPropertyDetail],
+    [navigation, openPropertyDetail, properties],
   );
 
   const renderProperty = useCallback(
@@ -127,7 +181,14 @@ const PropertiesScreen = () => {
             <StyledText color={COLORS.SURFACE} variant="bold" size={20}>
               {t('PROPERTIES.TITLE')}
             </StyledText>
-            <TouchableOpacity accessibilityRole="button" style={styles.newButton}>
+            <TouchableOpacity
+              accessibilityRole="button"
+              style={styles.newButton}
+              onPress={() =>
+                navigation.navigate(NAVIGATION.STACKS.COMMON, {
+                  screen: NAVIGATION.COMMON.CREATE_LISTING_SCREEN,
+                })
+              }>
               <PlusIcon />
               <StyledText color={COLORS.PRIMARY} variant="bold" size={12}>
                 {t('PROPERTIES.NEW')}
@@ -148,13 +209,6 @@ const PropertiesScreen = () => {
           keyExtractor={keyExtractor}
           ItemSeparatorComponent={PropertySeparator}
           ListEmptyComponent={renderEmpty}
-          // refreshControl={
-          //   <RefreshControl
-          //     refreshing={isFetching && !isLoading}
-          //     onRefresh={refetch}
-          //     tintColor={COLORS.LOGIN_PRIMARY}
-          //   />
-          // }
           showsVerticalScrollIndicator={false}
           contentContainerStyle={[
             styles.list,
@@ -162,6 +216,14 @@ const PropertiesScreen = () => {
           ]}
         />
       </View>
+
+      <DeletePropertyModal
+        isVisible={Boolean(deleteTarget)}
+        listingName={deleteTarget?.listingName}
+        isDeleting={Boolean(deletingPropertyId)}
+        onCancel={handleCloseDeleteModal}
+        onConfirm={handleConfirmDelete}
+      />
     </ScreenContainer>
   );
 };

@@ -5,7 +5,13 @@ import React, {
   useRef,
   useState,
 } from 'react';
-import {ActivityIndicator, TouchableOpacity, View} from 'react-native';
+import {
+  ActivityIndicator,
+  findNodeHandle,
+  InteractionManager,
+  TouchableOpacity,
+  View,
+} from 'react-native';
 import {useNavigation, useRoute} from '@react-navigation/native';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import {useTranslation} from 'react-i18next';
@@ -105,6 +111,9 @@ const CreateInvoiceScreen = () => {
   const insets = useSafeAreaInsets();
   const invoiceForm = FORM_SCHEMA.CREATE_INVOICE;
   const nextItemId = useRef(2);
+  const scrollRef = useRef(null);
+  const lineItemRefs = useRef({});
+  const pendingScrollItemId = useRef(null);
   const [activeDateField, setActiveDateField] = useState(null);
   const [initialValues, setInitialValues] = useState(EMPTY_VALUES);
   const [invoiceStatus, setInvoiceStatus] = useState('');
@@ -481,8 +490,9 @@ const CreateInvoiceScreen = () => {
           };
 
           const handleAddItem = () => {
-            const itemId = nextItemId.current;
+            const itemId = String(nextItemId.current);
             nextItemId.current += 1;
+            pendingScrollItemId.current = itemId;
             setFieldValue(
               'lineItems',
               [...lineItems, createLineItem(itemId)],
@@ -491,15 +501,40 @@ const CreateInvoiceScreen = () => {
             setFieldTouched('lineItems', true, false);
           };
 
+          const handleLineItemLayout = itemId => {
+            if (pendingScrollItemId.current !== itemId) {
+              return;
+            }
+
+            pendingScrollItemId.current = null;
+            const target = lineItemRefs.current[itemId];
+            const node = target ? findNodeHandle(target) : null;
+
+            if (!node || !scrollRef.current?.scrollToFocusedInput) {
+              return;
+            }
+
+            InteractionManager.runAfterInteractions(() => {
+              requestAnimationFrame(() => {
+                // Keep the new card clear of the open keyboard.
+                scrollRef.current?.scrollToFocusedInput?.(node, 280, 50);
+              });
+            });
+          };
+
           return (
             <View style={styles.flex}>
               <KeyboardAwareScrollView
+                ref={scrollRef}
                 enableOnAndroid
                 enableAutomaticScroll
                 enableResetScrollToCoords={false}
-                extraScrollHeight={20}
+                extraScrollHeight={24}
                 keyboardShouldPersistTaps="handled"
-                contentContainerStyle={styles.scrollContent}
+                contentContainerStyle={[
+                  styles.scrollContent,
+                  {paddingBottom: 118 + Math.max(insets.bottom, 10)},
+                ]}
                 showsVerticalScrollIndicator={false}>
                 <View style={styles.section}>
                   <SectionHeader
@@ -606,16 +641,23 @@ const CreateInvoiceScreen = () => {
                     }
                   />
                   {lineItems.map((item, index) => (
-                    <InvoiceLineItem
+                    <View
                       key={item.id}
-                      index={index}
-                      item={item}
-                      itemOptions={itemOptions}
-                      isItemOptionsLoading={isFoodMenuLoading}
-                      onChange={handleItemChange}
-                      onRemove={handleRemoveItem}
-                    />
+                      ref={ref => {
+                        lineItemRefs.current[item.id] = ref;
+                      }}
+                      onLayout={() => handleLineItemLayout(item.id)}>
+                      <InvoiceLineItem
+                        index={index}
+                        item={item}
+                        itemOptions={itemOptions}
+                        isItemOptionsLoading={isFoodMenuLoading}
+                        onChange={handleItemChange}
+                        onRemove={handleRemoveItem}
+                      />
+                    </View>
                   ))}
+
                   <TouchableOpacity
                     accessibilityRole="button"
                     onPress={handleAddItem}

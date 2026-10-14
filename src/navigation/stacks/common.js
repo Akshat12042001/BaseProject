@@ -8,6 +8,10 @@ import {
   PropertyDetailScreen,
   CreateBookingScreen,
   BookingScreen,
+  CreateListingScreen,
+  SupportScreen,
+  NotificationScreen,
+  RewardsScreen,
 } from '../../screens/common';
 import config from '../config';
 
@@ -39,6 +43,22 @@ export default () => {
       <Stack.Screen
         name={NAVIGATION.COMMON.BOOKING_SCREEN}
         component={BookingScreen}
+      />
+      <Stack.Screen
+        name={NAVIGATION.COMMON.CREATE_LISTING_SCREEN}
+        component={CreateListingScreen}
+      />
+      <Stack.Screen
+        name={NAVIGATION.COMMON.SUPPORT_SCREEN}
+        component={SupportScreen}
+      />
+      <Stack.Screen
+        name={NAVIGATION.COMMON.NOTIFICATION_SCREEN}
+        component={NotificationScreen}
+      />
+      <Stack.Screen
+        name={NAVIGATION.COMMON.REWARDS_SCREEN}
+        component={RewardsScreen}
       />
     </Stack.Navigator>
   );

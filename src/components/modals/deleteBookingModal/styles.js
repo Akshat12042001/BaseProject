@@ -47,6 +47,10 @@ export default StyleSheet.create({
     paddingHorizontal: 16,
     paddingVertical: 10,
   },
+  deleteButtonWithIcon: {
+    flexDirection: 'row',
+    gap: 8,
+  },
   disabledButton: {
     opacity: 0.65,
   },

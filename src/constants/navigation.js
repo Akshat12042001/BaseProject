@@ -22,6 +22,10 @@ export default {
         CREATE_LOGO_SCREEN: 'Common-CreateLogoScreen',
         PROPERTY_DETAIL_SCREEN: 'Common-PropertyDetailScreen',
         CREATE_BOOKING_SCREEN: 'Common-CreateBookingScreen',
-        BOOKING_SCREEN: 'Common-BookingScreen'
+        BOOKING_SCREEN: 'Common-BookingScreen',
+        CREATE_LISTING_SCREEN: 'Common-CreateListingScreen',
+        SUPPORT_SCREEN: 'Common-SupportScreen',
+        NOTIFICATION_SCREEN: 'Common-NotificationScreen',
+        REWARDS_SCREEN: 'Common-RewardsScreen'
     }
 };

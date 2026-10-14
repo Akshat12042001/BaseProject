@@ -8,6 +8,9 @@ buildscript {
         targetSdkVersion = 36
         ndkVersion = "27.1.12297006"
         kotlinVersion = "2.1.20"
+        // Avoid Android Studio Gradle failing when `node` is missing from PATH
+        // (react-native-gesture-handler calls `node` unless this is set).
+        REACT_NATIVE_NODE_MODULES_DIR = new File(rootDir, "../node_modules/react-native").absolutePath
     }
     repositories {
         google()

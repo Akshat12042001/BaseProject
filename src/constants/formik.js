@@ -316,4 +316,174 @@ export default {
         .required('CREATE_MENU.CATEGORIES_REQUIRED'),
     }),
   },
+  CREATE_LISTING: {
+    schema: Yup.object().shape({
+      propertyTitle: Yup.string()
+        .trim()
+        .required('CREATE_LISTING.ERRORS.TITLE_REQUIRED')
+        .min(10, 'CREATE_LISTING.ERRORS.TITLE_MIN'),
+      description: Yup.string()
+        .trim()
+        .required('CREATE_LISTING.ERRORS.DESCRIPTION_REQUIRED')
+        .min(50, 'CREATE_LISTING.ERRORS.DESCRIPTION_MIN')
+        .max(2000, 'CREATE_LISTING.ERRORS.DESCRIPTION_MAX'),
+      addressLine1: Yup.string()
+        .trim()
+        .required('CREATE_LISTING.ERRORS.ADDRESS_REQUIRED')
+        .min(10, 'CREATE_LISTING.ERRORS.ADDRESS_MIN'),
+      addressLine2: schemas.stringOptional,
+      city: Yup.string().trim().required('CREATE_LISTING.ERRORS.CITY_REQUIRED'),
+      state: Yup.string().trim().required('CREATE_LISTING.ERRORS.STATE_REQUIRED'),
+      postalCode: Yup.string()
+        .trim()
+        .required('CREATE_LISTING.ERRORS.POSTAL_REQUIRED')
+        .matches(/^\d{6}$/, 'CREATE_LISTING.ERRORS.POSTAL_INVALID'),
+      propertyType: Yup.string()
+        .trim()
+        .required('CREATE_LISTING.ERRORS.PROPERTY_TYPE_REQUIRED'),
+      guests: Yup.string()
+        .trim()
+        .required('ERRORS.REQUIRED')
+        .matches(/^[1-9]\d*$/, 'CREATE_LISTING.ERRORS.COUNT_MIN'),
+      bedrooms: Yup.string()
+        .trim()
+        .required('ERRORS.REQUIRED')
+        .matches(/^[1-9]\d*$/, 'CREATE_LISTING.ERRORS.COUNT_MIN'),
+      beds: Yup.string()
+        .trim()
+        .required('ERRORS.REQUIRED')
+        .matches(/^[1-9]\d*$/, 'CREATE_LISTING.ERRORS.COUNT_MIN'),
+      bathrooms: Yup.string()
+        .trim()
+        .required('ERRORS.REQUIRED')
+        .matches(/^[1-9]\d*$/, 'CREATE_LISTING.ERRORS.COUNT_MIN'),
+      entireDescription: Yup.string().trim().max(500).optional(),
+      rentalOptions: Yup.array().of(
+        Yup.object().shape({
+          id: Yup.string(),
+          name: Yup.string()
+            .trim()
+            .required('CREATE_LISTING.ERRORS.OPTION_NAME_REQUIRED'),
+          bedrooms: Yup.string()
+            .trim()
+            .required('ERRORS.REQUIRED')
+            .matches(/^[1-9]\d*$/, 'CREATE_LISTING.ERRORS.COUNT_MIN'),
+          beds: Yup.string()
+            .trim()
+            .required('ERRORS.REQUIRED')
+            .matches(/^[1-9]\d*$/, 'CREATE_LISTING.ERRORS.COUNT_MIN'),
+          pricePerNight: Yup.string()
+            .trim()
+            .required('CREATE_LISTING.ERRORS.OPTION_PRICE_REQUIRED')
+            .matches(/^\d+(\.\d{1,2})?$/, 'CREATE_LISTING.ERRORS.AMOUNT_INVALID'),
+          offSeasonPrice: Yup.string()
+            .trim()
+            .matches(/^(\d+(\.\d{1,2})?)?$/, 'CREATE_LISTING.ERRORS.AMOUNT_INVALID'),
+          units: Yup.string()
+            .trim()
+            .required('ERRORS.REQUIRED')
+            .matches(/^[1-9]\d*$/, 'CREATE_LISTING.ERRORS.COUNT_MIN'),
+          maxGuests: Yup.string()
+            .trim()
+            .required('ERRORS.REQUIRED')
+            .matches(/^[1-9]\d*$/, 'CREATE_LISTING.ERRORS.COUNT_MIN'),
+          bathrooms: Yup.string()
+            .trim()
+            .required('ERRORS.REQUIRED')
+            .matches(/^[1-9]\d*$/, 'CREATE_LISTING.ERRORS.COUNT_MIN'),
+          description: Yup.string().trim().max(500).optional(),
+          attachedBathroom: Yup.boolean(),
+          hasBalcony: Yup.boolean(),
+        }),
+      ),
+      houseRules: schemas.stringOptional,
+      cancellationPolicy: schemas.stringOptional,
+    }),
+  },
+  CREATE_LISTING_QUESTIONS: {
+    schema: Yup.object().shape({
+      distanceFromTown: Yup.string()
+        .trim()
+        .required('CREATE_LISTING.ERRORS.DISTANCE_REQUIRED')
+        .matches(/^\d+$/, 'CREATE_LISTING.ERRORS.DISTANCE_INVALID'),
+      distanceUnit: Yup.string()
+        .trim()
+        .required('CREATE_LISTING.ERRORS.UNIT_REQUIRED'),
+      offRoad: Yup.boolean(),
+      walkingDistance: Yup.string()
+        .trim()
+        .required('CREATE_LISTING.ERRORS.WALKING_REQUIRED')
+        .matches(/^\d+$/, 'CREATE_LISTING.ERRORS.DISTANCE_INVALID'),
+      walkingUnit: Yup.string()
+        .trim()
+        .required('CREATE_LISTING.ERRORS.UNIT_REQUIRED'),
+      privateParking: Yup.boolean(),
+      stairClimb: Yup.boolean(),
+      suitableFor: Yup.array()
+        .of(Yup.string())
+        .min(1, 'CREATE_LISTING.ERRORS.SUITABLE_FOR_REQUIRED'),
+    }),
+  },
+  CREATE_LISTING_PRICING: {
+    schema: Yup.object().shape({
+      pricePerDay: Yup.string()
+        .trim()
+        .required('CREATE_LISTING.ERRORS.PRICE_PER_DAY_REQUIRED')
+        .matches(/^\d+(\.\d{1,2})?$/, 'CREATE_LISTING.ERRORS.AMOUNT_INVALID'),
+      weeklyStays: Yup.boolean(),
+      pricePerWeek: Yup.string().when('weeklyStays', {
+        is: true,
+        then: schema =>
+          schema
+            .trim()
+            .required('CREATE_LISTING.ERRORS.PRICE_PER_WEEK_REQUIRED')
+            .matches(/^\d+(\.\d{1,2})?$/, 'CREATE_LISTING.ERRORS.AMOUNT_INVALID'),
+        otherwise: schema => schema,
+      }),
+      monthlyStays: Yup.boolean(),
+      pricePerMonth: Yup.string().when('monthlyStays', {
+        is: true,
+        then: schema =>
+          schema
+            .trim()
+            .required('CREATE_LISTING.ERRORS.PRICE_PER_MONTH_REQUIRED')
+            .matches(/^\d+(\.\d{1,2})?$/, 'CREATE_LISTING.ERRORS.AMOUNT_INVALID'),
+        otherwise: schema => schema,
+      }),
+      offSeasonPrices: Yup.boolean(),
+      offSeasonPricePerDay: Yup.string().when('offSeasonPrices', {
+        is: true,
+        then: schema =>
+          schema
+            .trim()
+            .required('CREATE_LISTING.ERRORS.OFF_SEASON_DAY_REQUIRED')
+            .matches(/^\d+(\.\d{1,2})?$/, 'CREATE_LISTING.ERRORS.AMOUNT_INVALID'),
+        otherwise: schema => schema,
+      }),
+      offSeasonPricePerMonth: Yup.string().when('offSeasonPrices', {
+        is: true,
+        then: schema =>
+          schema
+            .trim()
+            .required('CREATE_LISTING.ERRORS.OFF_SEASON_MONTH_REQUIRED')
+            .matches(/^\d+(\.\d{1,2})?$/, 'CREATE_LISTING.ERRORS.AMOUNT_INVALID'),
+        otherwise: schema => schema,
+      }),
+      cleaningFee: Yup.string()
+        .trim()
+        .matches(/^(\d+(\.\d{1,2})?)?$/, 'CREATE_LISTING.ERRORS.AMOUNT_INVALID'),
+      securityDeposit: Yup.string()
+        .trim()
+        .matches(/^(\d+(\.\d{1,2})?)?$/, 'CREATE_LISTING.ERRORS.AMOUNT_INVALID'),
+      minimumStay: Yup.string()
+        .trim()
+        .required('CREATE_LISTING.ERRORS.MINIMUM_STAY_REQUIRED'),
+      checkInTime: Yup.string()
+        .trim()
+        .required('CREATE_LISTING.ERRORS.CHECK_IN_TIME_REQUIRED'),
+      checkOutTime: Yup.string()
+        .trim()
+        .required('CREATE_LISTING.ERRORS.CHECK_OUT_TIME_REQUIRED'),
+    }),
+  },
 };

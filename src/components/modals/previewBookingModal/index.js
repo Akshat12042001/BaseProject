@@ -1,4 +1,4 @@
-import React, {useCallback, useMemo} from 'react';
+import React, {useCallback, useMemo, useState} from 'react';
 import {
   ActivityIndicator,
   Image,
@@ -10,9 +10,14 @@ import Modal from 'react-native-modal';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import {useTranslation} from 'react-i18next';
 import {StyledText} from '../../atoms';
-import {CloseIcon} from '../../svgs';
+import {CloseIcon, ShareIcon} from '../../svgs';
 import {COLORS} from '../../../constants';
+import {errorToast} from '../../../utils/alerts';
 import {formatCurrencyWithDecimals} from '../../../utils/invoice';
+import {
+  getDealSummaryShareTitle,
+  shareDealSummary,
+} from '../../../utils/shareDealSummary';
 import styles from './styles';
 
 const DEFAULT_LOGO_URL = 'https://www.boonies.in/Final-boonies-logo.png';
@@ -103,10 +108,35 @@ const PreviewBookingModal = ({
 }) => {
   const {t} = useTranslation();
   const insets = useSafeAreaInsets();
+  const [isSharing, setIsSharing] = useState(false);
 
   const handleClose = useCallback(() => {
     onClose?.();
   }, [onClose]);
+
+  const handleShare = useCallback(async () => {
+    if (!data || isSharing || isLoading) {
+      return;
+    }
+
+    try {
+      setIsSharing(true);
+      await shareDealSummary(
+        data,
+        getDealSummaryShareTitle(
+          data.guest?.name,
+          data.propertyName || data.title || fallbackTitle,
+        ),
+      );
+    } catch (error) {
+      const message = String(error?.message || '').toLowerCase();
+      if (!message.includes('cancel') && !message.includes('did not share')) {
+        errorToast(t('BOOKING_LIST.SHARE_FAILED'));
+      }
+    } finally {
+      setIsSharing(false);
+    }
+  }, [data, fallbackTitle, isLoading, isSharing, t]);
 
   const preview = useMemo(() => {
     const guest = data?.guest || {};
@@ -209,14 +239,29 @@ const PreviewBookingModal = ({
             containerStyle={styles.headerTitle}>
             {preview.title}
           </StyledText>
-          <TouchableOpacity
-            accessibilityRole="button"
-            accessibilityLabel={t('BOOKING_LIST.PREVIEW_CLOSE')}
-            hitSlop={{top: 8, bottom: 8, left: 8, right: 8}}
-            onPress={handleClose}
-            style={styles.closeButton}>
-            <CloseIcon color={COLORS.GREYSCALE_900} size={14} />
-          </TouchableOpacity>
+          <View style={styles.headerActions}>
+            <TouchableOpacity
+              accessibilityRole="button"
+              accessibilityLabel={t('BOOKING_LIST.MENU_SHARE')}
+              disabled={!data || isLoading || isSharing}
+              hitSlop={{top: 8, bottom: 8, left: 8, right: 8}}
+              onPress={handleShare}
+              style={styles.closeButton}>
+              {isSharing ? (
+                <ActivityIndicator color={COLORS.LOGIN_PRIMARY} size="small" />
+              ) : (
+                <ShareIcon color={COLORS.GREYSCALE_900} size={18} />
+              )}
+            </TouchableOpacity>
+            <TouchableOpacity
+              accessibilityRole="button"
+              accessibilityLabel={t('BOOKING_LIST.PREVIEW_CLOSE')}
+              hitSlop={{top: 8, bottom: 8, left: 8, right: 8}}
+              onPress={handleClose}
+              style={styles.closeButton}>
+              <CloseIcon color={COLORS.GREYSCALE_900} size={22} />
+            </TouchableOpacity>
+          </View>
         </View>
 
         {isLoading ? (

@@ -6,5 +6,7 @@ export {default as BookingCalendarModal} from './bookingCalendarModal';
 export {default as DeleteBookingModal} from './deleteBookingModal';
 export {default as DeleteBillModal} from './deleteBillModal';
 export {default as DeleteMenuModal} from './deleteMenuModal';
+export {default as DeletePropertyModal} from './deletePropertyModal';
 export {default as PreviewBookingModal} from './previewBookingModal';
 export {default as PreviewBillModal} from './previewBillModal';
+export {default as SelectLocationModal} from './selectLocationModal';
