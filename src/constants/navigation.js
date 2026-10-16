@@ -26,6 +26,8 @@ export default {
         CREATE_LISTING_SCREEN: 'Common-CreateListingScreen',
         SUPPORT_SCREEN: 'Common-SupportScreen',
         NOTIFICATION_SCREEN: 'Common-NotificationScreen',
-        REWARDS_SCREEN: 'Common-RewardsScreen'
+        REWARDS_SCREEN: 'Common-RewardsScreen',
+        SHOP_SCREEN: 'Common-ShopScreen',
+        ORDERS_SCREEN: 'Common-OrdersScreen'
     }
 };

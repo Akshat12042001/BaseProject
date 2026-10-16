@@ -1,4 +1,4 @@
-import React, {useCallback, useEffect, useMemo, useState} from 'react';
+import React, {useCallback, useMemo, useRef, useState} from 'react';
 import {FlatList, ScrollView, TouchableOpacity, View} from 'react-native';
 import Skeleton from 'react-native-reanimated-skeleton';
 import {useTranslation} from 'react-i18next';
@@ -107,12 +107,15 @@ const HomeScreen = () => {
     useGetNotificationsQuery(NOTIFICATION_QUERY);
   const user = useSelector(state => state.auth.user);
   const dispatch = useDispatch();
+  const userRef = useRef(user);
+  userRef.current = user;
   const recentProperties = dashboardData?.recentProperties || [];
   const [greetingKey, setGreetingKey] = useState(getTimeBasedGreetingKey);
   const [deleteTarget, setDeleteTarget] = useState(null);
   const [deletingPropertyId, setDeletingPropertyId] = useState(null);
+  const [isMeLoading, setIsMeLoading] = useState(() => !user?.quickStats);
 
-  const quickStats = dashboardData?.quickStats || {};
+  const quickStats = user?.quickStats || {};
   const hasUnreadNotifications = useMemo(
     () =>
       (notificationsResponse?.data || []).some(
@@ -240,33 +243,40 @@ const HomeScreen = () => {
     [insets.top],
   );
 
+  const fetchMe = useCallback(async () => {
+    const currentUser = userRef.current;
+    if (!currentUser?.accessToken) {
+      return;
+    }
+
+    try {
+      if (!currentUser?.quickStats) {
+        setIsMeLoading(true);
+      }
+
+      const response = await makeMeRequest();
+      dispatch(
+        setUserData({
+          ...response,
+          accessToken: currentUser.accessToken,
+          refreshToken: currentUser.refreshToken,
+        }),
+      );
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setIsMeLoading(false);
+    }
+  }, [dispatch]);
+
   useFocusEffect(
     useCallback(() => {
       setGreetingKey(getTimeBasedGreetingKey());
+      fetchMe();
       refetchDashboard();
       refetchNotifications();
-    }, [refetchDashboard, refetchNotifications]),
+    }, [fetchMe, refetchDashboard, refetchNotifications]),
   );
-
-  const fetchMe = useCallback(async () => {
-    try {
-      const response = await makeMeRequest();
-      const userData = {
-        ...response,
-        accessToken: user?.accessToken,
-        refreshToken: user?.refreshToken,
-      };
-      dispatch(setUserData(userData));
-    } catch (error) {
-      console.log(error);
-    }
-  }, [dispatch, user?.accessToken, user?.refreshToken]);
-
-  useEffect(() => {
-    if(user?.accessToken){
-      fetchMe();
-    }
-  }, [fetchMe, user?.accessToken]);
 
   const openPropertyDetail = useCallback(
     (propertyId, isListingView = false) => {
@@ -476,7 +486,7 @@ const HomeScreen = () => {
           contentContainerStyle={styles.content}
           showsVerticalScrollIndicator={false}>
           <Skeleton
-            isLoading={isLoading}
+            isLoading={isMeLoading}
             layout={STATS_SKELETON_LAYOUT}
             boneColor={COLORS.SKELETON_BONE}
             highlightColor={COLORS.SKELETON_HIGHLIGHT}

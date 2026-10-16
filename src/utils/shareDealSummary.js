@@ -40,6 +40,35 @@ const formatShareAmount = value => {
 export const getDealSummaryShareTitle = (guestName = '', propertyName = '') =>
   getBookingShareName(guestName, propertyName);
 
+const formatOccupancyLine = occupancy => {
+  const adults = Number(occupancy?.adults) || 0;
+  const children = Number(occupancy?.children) || 0;
+  const pets = Number(occupancy?.pets) || 0;
+  const parts = [
+    `${adults} Adult${adults === 1 ? '' : 's'}`,
+    `${children} Child${children === 1 ? '' : 'ren'}`,
+  ];
+
+  if (pets > 0) {
+    parts.push(`${pets} Pet${pets === 1 ? '' : 's'}`);
+  }
+
+  return parts.join(', ');
+};
+
+const formatInclusionsLine = inclusions => {
+  const parts = [];
+
+  if (inclusions?.breakfast) {
+    parts.push('Breakfast');
+  }
+  if (inclusions?.dinner) {
+    parts.push('Dinner');
+  }
+
+  return parts.length ? parts.join(', ') : 'None';
+};
+
 export const getBookingShareMessage = data => {
   const guestName = String(data?.guest?.name || '').trim();
   const unit = String(data?.propertyName || data?.title || '').trim();
@@ -47,28 +76,35 @@ export const getBookingShareMessage = data => {
   const checkOutDate = String(data?.checkOut?.date || '').trim();
   const checkInTime = String(data?.checkIn?.time || '').trim();
   const checkOutTime = String(data?.checkOut?.time || '').trim();
-  const adults = Number(data?.occupancy?.adults) || 0;
   const total = Number(data?.pricing?.offeredPrice) || 0;
   const advance = Number(data?.pricing?.advancePayment) || 0;
+  const balanceDue =
+    data?.pricing?.balanceDue != null
+      ? Number(data.pricing.balanceDue) || 0
+      : Math.max(0, total - advance);
   const greeting = guestName ? `Hi ${guestName},` : 'Hi,';
+  const checkInLine = [checkInDate, checkInTime].filter(Boolean).join(', ');
+  const checkOutLine = [checkOutDate, checkOutTime].filter(Boolean).join(', ');
 
   return `${greeting}
-Your booking is confirmed from ${checkInDate} to ${checkOutDate}.
-Unit: ${unit}
-Guest: ${adults} adults.
-Checkin ${checkInDate}
-Checkout ${checkOutDate}
-Total agreed Payment: ${formatShareAmount(total)}.
-Advance paid: ${formatShareAmount(advance)}.
-Check-in time: ${checkInTime}
-Check-out time: ${checkOutTime}
+
+Your booking is confirmed.
+
+Property: ${unit || '—'}
+Check-in: ${checkInLine || '—'}
+Check-out: ${checkOutLine || '—'}
+Guests: ${formatOccupancyLine(data?.occupancy)}
+Inclusions: ${formatInclusionsLine(data?.inclusions)}
+
+Total: ${formatShareAmount(total)}
+Advance paid: ${formatShareAmount(advance)}
+Balance due at check-in: ${formatShareAmount(balanceDue)}
 
 Please note:
-1) All the guests need to share the valid ID card at the time of checkin.
+1) All guests need to share a valid ID card at check-in.
+2) Any damage to the property or its contents will be charged in full for repair or replacement.
 
-2) Any damage to the property or its content will result in a full charge to cover repair or replacement costs.
-
-Please treat the space with care and respect. Thank you for the understanding.`;
+Please treat the space with care and respect. Thank you for understanding.`;
 };
 
 export const generateDealSummaryPdf = async data => {

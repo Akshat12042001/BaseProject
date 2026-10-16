@@ -15,6 +15,7 @@ import {
 import {useNavigation, useRoute} from '@react-navigation/native';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import {useTranslation} from 'react-i18next';
+import {useDispatch} from 'react-redux';
 import {Formik} from 'formik';
 import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
 import DatePicker from 'react-native-date-picker';
@@ -37,6 +38,7 @@ import {COLORS, FORM_SCHEMA} from '../../../constants';
 import {
   makeCreateBillRequest,
   makeGetBillDetailsRequest,
+  makeGetBillsRequest,
   makeGetBookingPreviewRequest,
   makeGetFoodMenuBillItemsRequest,
   makeUpdateBillRequest,
@@ -51,7 +53,10 @@ import {
 import {formatBookingInvoicePrefill} from '../../../utils/booking';
 import {errorToast, successToast} from '../../../utils/alerts';
 import styles from './styles';
-import {useGetMyPropertiesQuery} from '../../../redux/tabs/api';
+import {tabsApi, useGetMyPropertiesQuery} from '../../../redux/tabs/api';
+
+const BILLS_PAGE_LIMIT = 10;
+const BILLS_QUERY_ARGS = {page: 1, limit: BILLS_PAGE_LIMIT};
 
 const sanitizeDecimal = value => {
   const sanitizedValue = value.replace(/[^0-9.]/g, '');
@@ -66,7 +71,35 @@ const DATE_FIELD = {
   CHECK_OUT: 'checkOut',
 };
 
+const VALIDATION_FIELD_ORDER = [
+  'checkIn',
+  'checkOut',
+  'paymentTerms',
+  'fromAddress',
+  'billTo',
+  'lineItems',
+];
+
 const formatDate = date => (date ? moment(date).format('DD/MM/YYYY') : '');
+
+const hasFieldError = error => {
+  if (!error) {
+    return false;
+  }
+  if (typeof error === 'string') {
+    return true;
+  }
+  if (Array.isArray(error)) {
+    return error.some(hasFieldError);
+  }
+  if (typeof error === 'object') {
+    return Object.values(error).some(hasFieldError);
+  }
+  return false;
+};
+
+const getFirstErrorField = formErrors =>
+  VALIDATION_FIELD_ORDER.find(fieldKey => hasFieldError(formErrors?.[fieldKey]));
 
 const createLineItem = id => ({
   id: String(id),
@@ -106,12 +139,14 @@ const CreateInvoiceScreen = () => {
   const {t} = useTranslation();
   const navigation = useNavigation();
   const route = useRoute();
+  const dispatch = useDispatch();
   const billId = route.params?.billId;
   const bookingId = route.params?.bookingId;
   const insets = useSafeAreaInsets();
   const invoiceForm = FORM_SCHEMA.CREATE_INVOICE;
   const nextItemId = useRef(2);
   const scrollRef = useRef(null);
+  const fieldRefs = useRef({});
   const lineItemRefs = useRef({});
   const pendingScrollItemId = useRef(null);
   const [activeDateField, setActiveDateField] = useState(null);
@@ -328,6 +363,18 @@ const CreateInvoiceScreen = () => {
         const response = billId
           ? await makeUpdateBillRequest(billId, invoicePayload)
           : await makeCreateBillRequest(invoicePayload);
+
+        // Bypass getBills merge/serializeQueryArgs quirks and write the
+        // fresh page-1 payload straight into the RTK cache the list reads.
+        const billsResponse = await makeGetBillsRequest(BILLS_QUERY_ARGS);
+        dispatch(
+          tabsApi.util.upsertQueryData(
+            'getBills',
+            BILLS_QUERY_ARGS,
+            billsResponse,
+          ),
+        );
+
         successToast(
           response?.message ||
             t(
@@ -346,6 +393,7 @@ const CreateInvoiceScreen = () => {
     [
       billId,
       deletedLineItems,
+      dispatch,
       invoiceMetadata,
       invoiceStatus,
       navigation,
@@ -380,6 +428,7 @@ const CreateInvoiceScreen = () => {
           handleSubmit: submitForm,
           setFieldValue,
           setFieldTouched,
+          validateForm,
           values,
           errors,
           touched,
@@ -522,6 +571,59 @@ const CreateInvoiceScreen = () => {
             });
           };
 
+          const scrollToField = fieldKey => {
+            const target =
+              fieldKey === 'lineItems'
+                ? fieldRefs.current.lineItems ||
+                  lineItemRefs.current[lineItems[0]?.id]
+                : fieldRefs.current[fieldKey];
+            const node = target ? findNodeHandle(target) : null;
+
+            if (!node) {
+              return;
+            }
+
+            InteractionManager.runAfterInteractions(() => {
+              requestAnimationFrame(() => {
+                if (scrollRef.current?.scrollToFocusedInput) {
+                  scrollRef.current.scrollToFocusedInput(node, 140, 50);
+                  return;
+                }
+
+                target.measureLayout?.(
+                  findNodeHandle(scrollRef.current),
+                  (_x, y) => {
+                    scrollRef.current?.scrollTo?.({
+                      y: Math.max(0, y - 24),
+                      animated: true,
+                    });
+                  },
+                  () => {},
+                );
+              });
+            });
+          };
+
+          const handleSavePress = async () => {
+            if (isCreatingInvoice) {
+              return;
+            }
+
+            VALIDATION_FIELD_ORDER.forEach(fieldKey => {
+              setFieldTouched(fieldKey, true, false);
+            });
+
+            const formErrors = await validateForm();
+            const firstErrorField = getFirstErrorField(formErrors);
+
+            if (firstErrorField) {
+              scrollToField(firstErrorField);
+              return;
+            }
+
+            submitForm();
+          };
+
           return (
             <View style={styles.flex}>
               <KeyboardAwareScrollView
@@ -542,55 +644,76 @@ const CreateInvoiceScreen = () => {
                     title={t('CREATE_INVOICE.STAY_DETAILS')}
                   />
                   <View style={styles.fieldsRow}>
+                    <View
+                      ref={ref => {
+                        fieldRefs.current.checkIn = ref;
+                      }}
+                      style={styles.dateField}>
+                      <Input
+                        label={`${t('CREATE_INVOICE.CHECK_IN')} *`}
+                        value={formatDate(values.checkIn)}
+                        placeholder={t('CREATE_INVOICE.DATE_PLACEHOLDER')}
+                        rightIcon={<CalendarIcon />}
+                        editable={false}
+                        onPress={handleOpenCheckInPicker}
+                        onRightIconPress={handleOpenCheckInPicker}
+                        error={
+                          touched.checkIn && errors.checkIn && !values.checkIn
+                            ? errors.checkIn
+                            : undefined
+                        }
+                        borderColor={fieldBorder}
+                        focusedBorderColor={fieldFocus}
+                      />
+                    </View>
+                    <View
+                      ref={ref => {
+                        fieldRefs.current.checkOut = ref;
+                      }}
+                      style={styles.dateField}>
+                      <Input
+                        label={`${t('CREATE_INVOICE.CHECK_OUT')} *`}
+                        value={formatDate(values.checkOut)}
+                        placeholder={t('CREATE_INVOICE.DATE_PLACEHOLDER')}
+                        rightIcon={<CalendarIcon />}
+                        editable={false}
+                        onPress={handleOpenCheckOutPicker}
+                        onRightIconPress={handleOpenCheckOutPicker}
+                        error={
+                          touched.checkOut &&
+                          errors.checkOut &&
+                          !values.checkOut
+                            ? errors.checkOut
+                            : undefined
+                        }
+                        borderColor={fieldBorder}
+                        focusedBorderColor={fieldFocus}
+                      />
+                    </View>
+                  </View>
+                  <View
+                    ref={ref => {
+                      fieldRefs.current.paymentTerms = ref;
+                    }}>
                     <Input
-                      label={`${t('CREATE_INVOICE.CHECK_IN')} *`}
-                      value={formatDate(values.checkIn)}
-                      placeholder={t('CREATE_INVOICE.DATE_PLACEHOLDER')}
-                      rightIcon={<CalendarIcon />}
-                      editable={false}
-                      onPress={handleOpenCheckInPicker}
-                      onRightIconPress={handleOpenCheckInPicker}
-                      error={
-                        touched.checkIn && errors.checkIn && !values.checkIn
-                          ? errors.checkIn
-                          : undefined
-                      }
-                      containerStyles={styles.dateField}
-                      borderColor={fieldBorder}
-                      focusedBorderColor={fieldFocus}
-                    />
-                    <Input
-                      label={`${t('CREATE_INVOICE.CHECK_OUT')} *`}
-                      value={formatDate(values.checkOut)}
-                      placeholder={t('CREATE_INVOICE.DATE_PLACEHOLDER')}
-                      rightIcon={<CalendarIcon />}
-                      editable={false}
-                      onPress={handleOpenCheckOutPicker}
-                      onRightIconPress={handleOpenCheckOutPicker}
-                      error={
-                        touched.checkOut && errors.checkOut && !values.checkOut
-                          ? errors.checkOut
-                          : undefined
-                      }
-                      containerStyles={styles.dateField}
+                      label={`${t('CREATE_INVOICE.PAYMENT_TERMS')} *`}
+                      value={values.paymentTerms}
+                      onBlur={handleBlur('paymentTerms')}
+                      onChangeText={handleChange('paymentTerms')}
+                      placeholder={t('CREATE_INVOICE.PAYMENT_TERMS_PLACEHOLDER')}
+                      error={touched.paymentTerms && errors.paymentTerms}
+                      containerStyles={styles.lastField}
                       borderColor={fieldBorder}
                       focusedBorderColor={fieldFocus}
                     />
                   </View>
-                  <Input
-                    label={`${t('CREATE_INVOICE.PAYMENT_TERMS')} *`}
-                    value={values.paymentTerms}
-                    onBlur={handleBlur('paymentTerms')}
-                    onChangeText={handleChange('paymentTerms')}
-                    placeholder={t('CREATE_INVOICE.PAYMENT_TERMS_PLACEHOLDER')}
-                    error={touched.paymentTerms && errors.paymentTerms}
-                    containerStyles={styles.lastField}
-                    borderColor={fieldBorder}
-                    focusedBorderColor={fieldFocus}
-                  />
                 </View>
 
-                <View style={styles.section}>
+                <View
+                  style={styles.section}
+                  ref={ref => {
+                    fieldRefs.current.fromAddress = ref;
+                  }}>
                   <SectionHeader
                     icon={<BuildingIcon />}
                     title={t('CREATE_INVOICE.FROM')}
@@ -612,7 +735,11 @@ const CreateInvoiceScreen = () => {
                   )}
                 </View>
 
-                <View style={styles.section}>
+                <View
+                  style={styles.section}
+                  ref={ref => {
+                    fieldRefs.current.billTo = ref;
+                  }}>
                   <SectionHeader
                     icon={<UserOutlineIcon />}
                     title={t('CREATE_INVOICE.BILL_TO')}
@@ -630,7 +757,11 @@ const CreateInvoiceScreen = () => {
                   />
                 </View>
 
-                <View style={styles.section}>
+                <View
+                  style={styles.section}
+                  ref={ref => {
+                    fieldRefs.current.lineItems = ref;
+                  }}>
                   <SectionHeader
                     icon={<ListIcon />}
                     title={`${t('CREATE_INVOICE.ITEMS')} *`}
@@ -726,7 +857,7 @@ const CreateInvoiceScreen = () => {
                 <View style={styles.actionsRow}>
                   <TouchableOpacity
                     disabled={isCreatingInvoice}
-                    onPress={submitForm}
+                    onPress={handleSavePress}
                     style={[
                       styles.saveButton,
                       isCreatingInvoice && styles.disabledButton,

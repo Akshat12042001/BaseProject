@@ -12,6 +12,8 @@ import {
   SupportScreen,
   NotificationScreen,
   RewardsScreen,
+  ShopScreen,
+  OrdersScreen,
 } from '../../screens/common';
 import config from '../config';
 
@@ -60,6 +62,14 @@ export default () => {
         name={NAVIGATION.COMMON.REWARDS_SCREEN}
         component={RewardsScreen}
       />
-    </Stack.Navigator>
+      <Stack.Screen
+        name={NAVIGATION.COMMON.SHOP_SCREEN}
+        component={ShopScreen}
+      />
+      <Stack.Screen
+        name={NAVIGATION.COMMON.ORDERS_SCREEN}
+        component={OrdersScreen}
+      />
+      </Stack.Navigator>
   );
 };

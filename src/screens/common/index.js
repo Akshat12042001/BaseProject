@@ -8,3 +8,5 @@ export {default as CreateListingScreen} from './createListingScreen';
 export {default as SupportScreen} from './supportScreen';
 export {default as NotificationScreen} from './notificationScreen';
 export {default as RewardsScreen} from './rewardsScreen';
+export {default as ShopScreen} from './shopScreen';
+export {default as OrdersScreen} from './ordersScreen';

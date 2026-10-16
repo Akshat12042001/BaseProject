@@ -40,14 +40,18 @@ const baseQuery = fetchBaseQuery({
         }),
         serializeQueryArgs: ({endpointName}) => endpointName,
         merge: (currentCache, newResponse, {arg}) => {
-          if (arg.page === 1) {
+          if (Number(arg?.page) === 1) {
+            return newResponse;
+          }
+
+          if (!currentCache?.data) {
             return newResponse;
           }
 
           const existingIds = new Set(
             currentCache.data.map(invoice => invoice.id),
           );
-          const nextInvoices = newResponse.data.filter(
+          const nextInvoices = (newResponse?.data || []).filter(
             invoice => !existingIds.has(invoice.id),
           );
 

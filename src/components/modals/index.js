@@ -10,3 +10,8 @@ export {default as DeletePropertyModal} from './deletePropertyModal';
 export {default as PreviewBookingModal} from './previewBookingModal';
 export {default as PreviewBillModal} from './previewBillModal';
 export {default as SelectLocationModal} from './selectLocationModal';
+export {default as ShopFilterModal} from './shopFilterModal';
+export {
+  DEFAULT_SHOP_CATEGORIES,
+  DEFAULT_SHOP_FILTERS,
+} from './shopFilterModal';

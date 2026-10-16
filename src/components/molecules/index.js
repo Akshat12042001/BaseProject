@@ -14,3 +14,4 @@ export {default as BookingCard} from './bookingCard';
 export {default as BookingFiltersSection} from './bookingFiltersSection';
 export {default as NotificationCard} from './notificationCard';
 export {default as AmenityCard} from './amenityCard';
+export {default as ShopProductCard} from './shopProductCard';

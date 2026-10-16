@@ -22,6 +22,8 @@ const ENDPOINTS = {
   STATES: '/locations/states',
   REWARDS: '/points/me/transactions',
   REWARDS_SUMMARY: '/points/me',
+  PRODUCT_CATALOG: '/products/host/catalog',
+  MY_ORDERS: '/orders/my',
 };
 
 
@@ -316,5 +318,17 @@ export const makeMarkNotificationReadRequest = notificationId => {
 export const makeGetBookingPreviewRequest = bookingId => {
   return APIClient()
     .get(`${ENDPOINTS.DEAL_PREVIEW}/${bookingId}/preview`)
+    .then(res => res.data);
+};
+
+export const makeGetHostProductCatalogRequest = params => {
+  return APIClient()
+    .get(ENDPOINTS.PRODUCT_CATALOG, {params})
+    .then(res => res.data);
+};
+
+export const makeGetMyOrdersRequest = params => {
+  return APIClient()
+    .get(ENDPOINTS.MY_ORDERS, {params})
     .then(res => res.data);
 };
